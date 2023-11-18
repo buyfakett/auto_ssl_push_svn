@@ -13,19 +13,13 @@ TORTOISE_ORM = {
                 'user': str(read_yaml('user', 'db')),
                 'password': str(read_yaml('password', 'db')),
                 'database': str(read_yaml('database', 'db')),
-                # 'minsize': 1,
-                # 'maxsize': 5,
-                # 'charset': 'utf8mb4',
-                # 'echo': True,
             }
         }
     },
     'apps': {
         'models': {
-            'models': ['aerich.models', 'models.test'],
+            'models': ['aerich.models', 'models.first_domain', 'models.server', 'models.ssl'],
             'default_connection': 'default',
         }
     },
-    # 'use_tz': False,
-    # 'timezone': 'Asia/Shanghai'
 }
