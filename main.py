@@ -21,12 +21,6 @@ app = FastAPI(
     title="auto_ssl_push_svn",
     version="0.1.0",
     description="自动获取ssl证书，并推送到svn",
-    servers=[
-        {
-            "description": "test",
-            "url": "https://ssl.nmg.buyfakett.top/api",
-        }
-    ],
     contact={
         "name": "buyfakett",
         "url": "https://github.com/buyfakett",
