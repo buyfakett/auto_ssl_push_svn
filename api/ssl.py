@@ -27,7 +27,7 @@ class SslModelList(BaseModel):
         from_attributes = True
 
 
-@ssl.get('/list', response_model=List[SslModelList])
+@ssl.get('/list', response_model=List[SslModelList], summary='获取证书列表')
 async def get_ssl():
     try:
         ssls = await Ssl.all().order_by('id')
@@ -47,7 +47,7 @@ class AddSslModel(BaseModel):
     status: int = 2
 
 
-@ssl.put('/add')
+@ssl.put('/add', summary='添加证书')
 async def add_ssl(item: AddSslModel):
     data = {
         "first_domain_id": item.first_domain_id,
@@ -74,7 +74,7 @@ async def add_ssl(item: AddSslModel):
     return resp_200(message='插入成功')
 
 
-@ssl.delete('/delete/{ssl_id}')
+@ssl.delete('/delete/{ssl_id}', summary='删除证书')
 async def delete_ssl(ssl_id: int):
     try:
         await Ssl.get(id=ssl_id)
@@ -98,7 +98,7 @@ class EditSslModel(BaseModel):
     status: int
 
 
-@ssl.post('/edit')
+@ssl.post('/edit', summary='编辑证书')
 async def edit_ssl(item: EditSslModel):
     data = {
         "id": item.id,

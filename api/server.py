@@ -22,7 +22,7 @@ class ServerModelList(BaseModel):
         from_attributes = True
 
 
-@server.get('/list', response_model=List[ServerModelList])
+@server.get('/list', response_model=List[ServerModelList], summary='获取服务器列表')
 async def get_server():
     try:
         servers = await Server.all().order_by('id')
@@ -40,7 +40,7 @@ class AddServerModel(BaseModel):
     password: str
 
 
-@server.put('/add')
+@server.put('/add', summary='添加服务器')
 async def add_server(item: AddServerModel):
     data = {
         "hostname": item.hostname,
@@ -56,7 +56,7 @@ async def add_server(item: AddServerModel):
     return resp_200(message='插入成功')
 
 
-@server.delete('/delete/{server_id}')
+@server.delete('/delete/{server_id}', summary='删除服务器')
 async def delete_server(server_id: int):
     try:
         await Server.get(id=server_id)
@@ -78,7 +78,7 @@ class EditServerModel(BaseModel):
     password: str
 
 
-@server.post('/edit')
+@server.post('/edit', summary='编辑服务器')
 async def edit_server(item: EditServerModel):
     data = {
         "id": item.id,

@@ -21,7 +21,7 @@ class DomainModelList(BaseModel):
         from_attributes = True
 
 
-@domain.get('/list', response_model=List[DomainModelList])
+@domain.get('/list', response_model=List[DomainModelList], summary='获取域名列表')
 async def get_domain():
     try:
         domains = await First_domain.filter(is_delete=False).order_by('id')
@@ -42,7 +42,7 @@ class AddDomainModel(BaseModel):
     is_delete: bool = False
 
 
-@domain.put('/add')
+@domain.put('/add', summary='添加域名')
 async def add_domain(item: AddDomainModel):
     data = {
         "domain": item.domain,
@@ -61,7 +61,7 @@ async def add_domain(item: AddDomainModel):
     return resp_200(message='插入成功')
 
 
-@domain.delete('/delete/{domain_id}')
+@domain.delete('/delete/{domain_id}', summary='删除域名')
 async def delete_domain(domain_id: int):
     try:
         await First_domain.get(id=domain_id)
@@ -85,7 +85,7 @@ class EditDomainModel(BaseModel):
     is_delete: bool = False
 
 
-@domain.post('/edit')
+@domain.post('/edit', summary='编辑域名')
 async def edit_domain(item: EditDomainModel):
     data = {
         "id": item.id,

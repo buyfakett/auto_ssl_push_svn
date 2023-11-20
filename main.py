@@ -7,8 +7,6 @@ from fastapi import FastAPI
 import uvicorn
 from tortoise.contrib.fastapi import register_tortoise
 from settings import TORTOISE_ORM
-from fastapi.openapi.utils import get_openapi
-from fastapi.openapi.docs import get_swagger_ui_html
 
 from api.domain import domain
 from api.server import server
