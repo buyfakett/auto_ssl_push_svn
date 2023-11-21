@@ -70,7 +70,7 @@ async def upload_svn():
     # print(output.decode('utf-8'), error.decode('utf-8'), process.returncode)
     exec_shell(command)
 
-    update_output, update_error, update_code = svn_client.add("/app/temp/svn/main.py")
+    update_output, update_error, update_code = svn_client.add("/app/temp/svn/main2.py")
     logging.info(f'Update Output: {update_output}')
     logging.error(f'Update Error: {update_error}')
     logging.info(f'Update Return Code: {update_code}')
