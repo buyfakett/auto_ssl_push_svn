@@ -4,7 +4,7 @@
 import subprocess
 
 
-def exec_shell(*, command: str):
+def exec_shell(command: str):
     """
     :param command:     string      命令
     :return output: string      日志
