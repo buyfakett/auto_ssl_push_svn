@@ -7,6 +7,7 @@ import os, subprocess
 from fastapi import APIRouter
 
 from util.svn import SVNClient
+from util.exec_shell import exec_shell
 from util.yaml_util import read_yaml
 from api.base import resp_200, resp_400
 from util.ssh import SSHClient
@@ -62,11 +63,12 @@ async def upload_svn():
     logging.error(f'Checkout Error: {checkout_error}')
     logging.info(f'Checkout Return Code: {checkout_code}')
 
-    command = 'cp /app/main.py /app/temp/svn/main.py'
+    command = 'cp /app/main.py /app/temp/svn/main2.py'
 
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output, error = process.communicate()
-    print(output.decode('utf-8'), error.decode('utf-8'), process.returncode)
+    # process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # output, error = process.communicate()
+    # print(output.decode('utf-8'), error.decode('utf-8'), process.returncode)
+    exec_shell(command)
 
     update_output, update_error, update_code = svn_client.add("/app/temp/svn/main.py")
     logging.info(f'Update Output: {update_output}')
@@ -77,3 +79,6 @@ async def upload_svn():
     logging.info(f'Commit Output: {commit_output}')
     logging.error(f'Commit Error: {commit_error}')
     logging.info(f'Commit Return Code: {commit_code}')
+
+    command2 = 'rm -rf /app/temp/svn'
+    exec_shell(command2)

@@ -2,6 +2,15 @@ import subprocess
 
 
 class SVNClient:
+    """
+    :param repo_url:     string      svn地址
+    :param working_copy_path: string     检出地址
+    :param username: string     用户名
+    :param password: string     密码
+    :return output: string      日志
+    :return error: string      错误
+    :return returncode: string      返回码
+    """
     def __init__(self, repo_url: str, working_copy_path: str, username: str, password: str):
         self.repo_url = repo_url
         self.working_copy_path = working_copy_path
