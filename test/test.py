@@ -2,9 +2,11 @@
 # @Author : buyfakett
 # @Time : 2023/11/20 17:12
 import logging
-import os
+import os, subprocess
 
 from fastapi import APIRouter
+
+from util.svn import SVNClient
 from util.yaml_util import read_yaml
 from api.base import resp_200, resp_400
 from util.ssh import SSHClient
@@ -48,3 +50,30 @@ async def upload_setup():
     os.remove(os.getcwd() + '/temp/setup.sh')
     return resp_200(message='上传配置文件成功')
     # 成功标识符：Successfully received certificate.
+
+
+@test1.get('/upload3')
+async def upload_svn():
+    svn_client = SVNClient(repo_url=read_yaml('svn_url', 'config'), working_copy_path='/app/temp/svn',
+                           username=read_yaml('svn_user', 'config'),
+                           password=read_yaml('svn_passwd', 'config'))
+    checkout_output, checkout_error, checkout_code = svn_client.checkout()
+    logging.info(f'检出日志: {checkout_output}')
+    logging.error(f'Checkout Error: {checkout_error}')
+    logging.info(f'Checkout Return Code: {checkout_code}')
+
+    command = 'cp /app/main.py /app/temp/svn/main.py'
+
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output, error = process.communicate()
+    print(output.decode('utf-8'), error.decode('utf-8'), process.returncode)
+
+    update_output, update_error, update_code = svn_client.add("/app/temp/svn/main.py")
+    logging.info(f'Update Output: {update_output}')
+    logging.error(f'Update Error: {update_error}')
+    logging.info(f'Update Return Code: {update_code}')
+
+    commit_output, commit_error, commit_code = svn_client.commit('Committing changes')
+    logging.info(f'Commit Output: {commit_output}')
+    logging.error(f'Commit Error: {commit_error}')
+    logging.info(f'Commit Return Code: {commit_code}')
