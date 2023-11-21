@@ -56,6 +56,13 @@ app.include_router(domain, prefix='/api/domain', tags=['域名'])
 app.include_router(server, prefix='/api/server', tags=['服务器'])
 app.include_router(ssl, prefix='/api/ssl', tags=['ssl证书'])
 
+
+@app.on_event("startup")
+async def startup_event():
+    # 应用启动时调用的逻辑
+    print("服务已启动！！！")
+
+
 if __name__ == "__main__":
     uvicorn.run(
         "setup:app",
