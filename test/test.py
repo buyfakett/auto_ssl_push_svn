@@ -60,25 +60,22 @@ async def upload_svn():
                            password=read_yaml('svn_passwd', 'config'))
     checkout_output, checkout_error, checkout_code = svn_client.checkout()
     logging.info(f'检出日志: {checkout_output}')
-    logging.error(f'Checkout Error: {checkout_error}')
-    logging.info(f'Checkout Return Code: {checkout_code}')
+    logging.error(f'检出错误: {checkout_error}')
+    logging.info(f'检出返回码: {checkout_code}')
 
     command = 'cp /app/main.py /app/temp/svn/main2.py'
 
-    # process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    # output, error = process.communicate()
-    # print(output.decode('utf-8'), error.decode('utf-8'), process.returncode)
     exec_shell(command)
 
-    update_output, update_error, update_code = svn_client.add("/app/temp/svn/main2.py")
-    logging.info(f'Update Output: {update_output}')
-    logging.error(f'Update Error: {update_error}')
-    logging.info(f'Update Return Code: {update_code}')
+    add_output, add_error, add_code = svn_client.add("/app/temp/svn/main2.py")
+    logging.info(f'增加日志: {add_output}')
+    logging.error(f'增加错误: {add_error}')
+    logging.info(f'增加返回码: {add_code}')
 
     commit_output, commit_error, commit_code = svn_client.commit('Committing changes')
-    logging.info(f'Commit Output: {commit_output}')
-    logging.error(f'Commit Error: {commit_error}')
-    logging.info(f'Commit Return Code: {commit_code}')
+    logging.info(f'提交日志: {commit_output}')
+    logging.error(f'提交错误: {commit_error}')
+    logging.info(f'提交返回码: {commit_code}')
 
     command2 = 'rm -rf /app/temp/svn'
     exec_shell(command2)
