@@ -56,19 +56,28 @@ def ask_ssl(aliyun_access_key: str, aliyun_access_secret: str, domain: str, host
     logging.error(f'检出错误: {checkout_error}')
     logging.info(f'检出返回码: {checkout_code}')
 
-    # copy_to_svn = f'cp /etc/letsencrypt/live/{domain}/cert.pem /app/temp/svn/{hostname}/ssl/{domain}.cer && cp /etc/letsencrypt/live/{domain}/privkey.pem /app/temp/svn/{hostname}/ssl/{domain}.key'
     ssh = SSHClient(host=read_yaml('server_host', 'config'), password=read_yaml('server_password', 'config'),
                     port=read_yaml('server_port', 'config'), username=read_yaml('server_user', 'config'))
-    if not ssh.wait_for_file(f'/etc/letsencrypt/live/{domain}/cert.pem'):
-        # 在文件存在时执行你的代码
-        return resp_400(message='申请证书失败')
-    ssh.download_file(f'/etc/letsencrypt/live/{domain}/cert.pem', os.getcwd() + f'/temp/svn/{hostname}/ssl/{domain}.cer')
-    ssh.download_file(f'/etc/letsencrypt/live/{domain}/privkey.pem', os.getcwd() + f'/temp/svn/{hostname}/ssl/{domain}.key')
-    ssh.close()
-    # exec_shell(copy_to_svn)
+    if not domain.startswith('*'):
+        if not ssh.wait_for_file(f'/etc/letsencrypt/live/{domain}/cert.pem'):
+            # 在文件存在时执行你的代码
+            return resp_400(message='申请证书失败')
+        ssh.download_file(f'/etc/letsencrypt/live/{domain}/cert.pem', os.getcwd() + f'/temp/svn/{hostname}/ssl/{domain}.cer')
+        ssh.download_file(f'/etc/letsencrypt/live/{domain}/privkey.pem', os.getcwd() + f'/temp/svn/{hostname}/ssl/{domain}.key')
+        ssh.execute_command('rm -rf /auto_ssl_push_svn')
+        ssh.close()
 
-    svn_client.add(f"/app/temp/svn/{hostname}/ssl/{domain}.key")
-    svn_client.add(f"/app/temp/svn/{hostname}/ssl/{domain}.cer")
+        svn_client.add(f"/app/temp/svn/{hostname}/ssl/{domain}.key")
+        svn_client.add(f"/app/temp/svn/{hostname}/ssl/{domain}.cer")
+    else:
+        if not ssh.wait_for_file(f'/etc/letsencrypt/live/{domain[2:]}/cert.pem'):
+            # 在文件存在时执行你的代码
+            return resp_400(message='申请证书失败')
+        ssh.execute_command('rm -rf /auto_ssl_push_svn')
+        ssh.close()
+
+        svn_client.add(f"/app/temp/svn/{hostname}/ssl/_{domain[1:]}.key")
+        svn_client.add(f"/app/temp/svn/{hostname}/ssl/_{domain[1:]}.cer")
 
     commit_output, commit_error, commit_code = svn_client.commit('Committing changes')
     logging.info(f'提交日志: {commit_output}')
