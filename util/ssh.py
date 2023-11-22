@@ -69,5 +69,12 @@ class SSHClient:
         sftp.close()
         logging.info("----------------上传文件结束----------------")
 
+    def download_file(self, remote_path, local_path):
+        logging.info("----------------开始下载文件----------------")
+        sftp = self.client.open_sftp()
+        sftp.get(remote_path, local_path)
+        sftp.close()
+        logging.info("----------------下载文件结束----------------")
+
     def close(self):
         self.client.close()

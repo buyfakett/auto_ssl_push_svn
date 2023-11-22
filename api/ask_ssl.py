@@ -57,9 +57,13 @@ def ask_ssl(aliyun_access_key: str, aliyun_access_secret: str, domain: str, host
     logging.error(f'检出错误: {checkout_error}')
     logging.info(f'检出返回码: {checkout_code}')
 
-    copy_to_svn = f'cp /etc/letsencrypt/live/{domain}/cert.pem /app/temp/svn/{hostname}/ssl/{domain}.cer && cp /etc/letsencrypt/live/{domain}/privkey.pem /app/temp/svn/{hostname}/ssl/{domain}.key'
-
-    exec_shell(copy_to_svn)
+    # copy_to_svn = f'cp /etc/letsencrypt/live/{domain}/cert.pem /app/temp/svn/{hostname}/ssl/{domain}.cer && cp /etc/letsencrypt/live/{domain}/privkey.pem /app/temp/svn/{hostname}/ssl/{domain}.key'
+    ssh = SSHClient(host=read_yaml('server_host', 'config'), password=read_yaml('server_password', 'config'),
+                    port=read_yaml('server_port', 'config'), username=read_yaml('server_user', 'config'))
+    ssh.download_file(f'/etc/letsencrypt/live/{domain}/cert.pem', os.getcwd() + f'/temp/svn/{hostname}/ssl/{domain}/{domain}.cer')
+    ssh.download_file(f'/etc/letsencrypt/live/{domain}/privkey.pem', os.getcwd() + f'/temp/svn/{hostname}/ssl/{domain}/{domain}.key')
+    ssh.close()
+    # exec_shell(copy_to_svn)
 
     svn_client.add(f"/app/temp/svn/{hostname}/ssl/{domain}.key")
     svn_client.add(f"/app/temp/svn/{hostname}/ssl/{domain}.cer")
