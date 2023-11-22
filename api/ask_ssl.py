@@ -72,12 +72,12 @@ def ask_ssl(aliyun_access_key: str, aliyun_access_secret: str, domain: str, host
         svn_client.add(f"/app/temp/svn/{hostname}/ssl/{domain}.key")
         svn_client.add(f"/app/temp/svn/{hostname}/ssl/{domain}.cer")
     else:
-        if not ssh.wait_for_file(f'/etc/letsencrypt/live/{domain[2:]}*/cert.pem'):
+        if not ssh.wait_for_file(f'/etc/letsencrypt/live/{domain[2:]}/cert.pem'):
             # 在文件存在时执行你的代码
             return resp_400(message='申请证书失败')
-        ssh.download_file(f'/etc/letsencrypt/live/{domain}*/cert.pem',
+        ssh.download_file(f'/etc/letsencrypt/live/{domain}/cert.pem',
                           os.getcwd() + f'/temp/svn/{hostname}/ssl/{domain}.cer')
-        ssh.download_file(f'/etc/letsencrypt/live/{domain}*/privkey.pem',
+        ssh.download_file(f'/etc/letsencrypt/live/{domain}/privkey.pem',
                           os.getcwd() + f'/temp/svn/{hostname}/ssl/{domain}.key')
         ssh.execute_command('rm -rf /auto_ssl_push_svn')
         ssh.close()
