@@ -51,7 +51,7 @@ register_tortoise(
     add_exception_handlers=True,  # 调试消息，生产环境不能开
 )
 
-app.include_router(test1, prefix='/api/test', tags=['测试接口'])
+# app.include_router(test1, prefix='/api/test', tags=['测试接口'])
 app.include_router(domain, prefix='/api/domain', tags=['域名'])
 app.include_router(server, prefix='/api/server', tags=['服务器'])
 app.include_router(ssl, prefix='/api/ssl', tags=['ssl证书'])
@@ -60,7 +60,7 @@ app.include_router(ssl, prefix='/api/ssl', tags=['ssl证书'])
 @app.on_event("startup")
 async def startup_event():
     # 应用启动时调用的逻辑
-    print("服务已启动！！！")
+    logging.info("服务已启动！！！")
 
 
 if __name__ == "__main__":
