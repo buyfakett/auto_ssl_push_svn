@@ -47,7 +47,6 @@ def ask_ssl(aliyun_access_key: str, aliyun_access_secret: str, domain: str, host
         return resp_400(message='上传/执行失败')
     ssh.close()
     os.remove(os.getcwd() + '/temp/setup.sh')
-    logging.info('申请证书成功')
     # 上传至svn
     svn_client = SVNClient(repo_url=read_yaml('svn_url', 'config'), working_copy_path=os.getcwd() + '/temp/svn',
                            username=read_yaml('svn_user', 'config'),
@@ -60,6 +59,9 @@ def ask_ssl(aliyun_access_key: str, aliyun_access_secret: str, domain: str, host
     # copy_to_svn = f'cp /etc/letsencrypt/live/{domain}/cert.pem /app/temp/svn/{hostname}/ssl/{domain}.cer && cp /etc/letsencrypt/live/{domain}/privkey.pem /app/temp/svn/{hostname}/ssl/{domain}.key'
     ssh = SSHClient(host=read_yaml('server_host', 'config'), password=read_yaml('server_password', 'config'),
                     port=read_yaml('server_port', 'config'), username=read_yaml('server_user', 'config'))
+    if not ssh.wait_for_file(f'/etc/letsencrypt/live/{domain}/cert.pem'):
+        # 在文件存在时执行你的代码
+        return resp_400(message='申请证书失败')
     ssh.download_file(f'/etc/letsencrypt/live/{domain}/cert.pem', os.getcwd() + f'/temp/svn/{hostname}/ssl/{domain}/{domain}.cer')
     ssh.download_file(f'/etc/letsencrypt/live/{domain}/privkey.pem', os.getcwd() + f'/temp/svn/{hostname}/ssl/{domain}/{domain}.key')
     ssh.close()

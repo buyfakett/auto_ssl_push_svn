@@ -1,5 +1,6 @@
 import logging
 import paramiko
+import time
 
 
 class SSHClient:
@@ -75,6 +76,25 @@ class SSHClient:
         sftp.get(remote_path, local_path)
         sftp.close()
         logging.info("----------------下载文件结束----------------")
+
+    def wait_for_file(self, remote_path, timeout=300):
+        start_time = time.time()
+
+        while time.time() - start_time < timeout:
+            sftp = self.client.open_sftp()
+
+            try:
+                sftp.stat(remote_path)
+                logging.info(f"文件 {remote_path} 存在，可以执行下一步操作。")
+                sftp.close()
+                return True
+            except FileNotFoundError:
+                logging.info(f"文件 {remote_path} 不存在，等待...")
+                sftp.close()
+                time.sleep(5)  # 休眠5秒，可以根据需要调整休眠时间
+
+        logging.error(f"超时：等待文件 {remote_path} 超过 {timeout} 秒。")
+        return False
 
     def close(self):
         self.client.close()
