@@ -33,6 +33,7 @@ def ask_ssl(aliyun_access_key: str, aliyun_access_secret: str, domain: str, host
         f.write('--name certbot \\\n')
         f.write('-v /etc/letsencrypt:/etc/letsencrypt \\\n')
         f.write('-v ./credentials.ini:/data/credentials.ini \\\n')
+        f.write('-v ./log/:/var/log/letsencrypt/ \\\n')
         f.write('registry.cn-hangzhou.aliyuncs.com/buyfakett/certbot-dns-aliyun \\\n')
         f.write("certonly --authenticator=dns-aliyun --dns-aliyun-credentials='/data/credentials.ini' \\\n")
         f.write(f' -d {domain} -m {mail} \\\n')
