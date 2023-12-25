@@ -91,33 +91,25 @@ async def delete_ssl(ssl_id: int):
 
 class EditSslModel(BaseModel):
     id: int
-    first_domain_id: int
-    server_id: int
-    certificate_domain: str
-    webroot: str
-    status: int
+    first_domain_id: Optional[int]
+    server_id: Optional[int]
+    certificate_domain: Optional[str]
+    webroot: Optional[str]
+    status: Optional[int]
 
 
 @ssl.post('/edit', summary='编辑证书')
 async def edit_ssl(item: EditSslModel):
-    data = {
-        "id": item.id,
-        "first_domain_id": item.first_domain_id,
-        "server_id": item.server_id,
-        "certificate_domain": item.certificate_domain,
-        "webroot": item.webroot,
-        "status": item.status,
-    }
     try:
-        old_data = await Ssl.get(id=data['id'])
+        old_data = await Ssl.get(id=item.id)
     except Exception as e:
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='没有查到该条数据')
-    old_data.first_domain_id = data['first_domain_id']
-    old_data.server_id = data['server_id']
-    old_data.certificate_domain = data['certificate_domain']
-    old_data.webroot = data['webroot']
-    old_data.status = data['status']
+    old_data.first_domain_id = item.first_domain_id
+    old_data.server_id = item.server_id
+    old_data.certificate_domain = item.certificate_domain
+    old_data.webroot = item.webroot
+    old_data.status = item.status
     try:
         await old_data.save()
     except Exception as e:

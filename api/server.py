@@ -3,11 +3,10 @@ import logging
 from fastapi import APIRouter
 from pydantic import BaseModel
 from models.server import Server
-from models.ssl import Ssl
 from tt_util.aes_util import encrypt_aes
 from tt_util.yaml_util import read_yaml
 from .base import resp_200, resp_400
-from typing import List
+from typing import List, Optional
 
 server = APIRouter()
 
@@ -69,36 +68,26 @@ async def delete_server(server_id: int):
     except Exception as e:
         logging.error(f"Error fetching server: {e}")
         return resp_400(message='删除错误')
-    try:
-        await Ssl.filter(server_id=server_id)
-    except:
-        pass
     return resp_200(message='删除成功')
 
 
 class EditServerModel(BaseModel):
     id: int
-    hostname: str
-    ip: str
-    password: str
+    hostname: Optional[str]
+    ip: Optional[str]
+    password: Optional[str]
 
 
 @server.post('/edit', summary='编辑服务器')
 async def edit_server(item: EditServerModel):
-    data = {
-        "id": item.id,
-        "hostname": item.hostname,
-        "ip": item.ip,
-        "password": item.password,
-    }
     try:
-        old_data = await Server.get(id=data['id'])
+        old_data = await Server.get(id=item.id)
     except Exception as e:
         logging.error(f"Error fetching server: {e}")
         return resp_400(message='没有查到该条数据')
-    old_data.hostname = data['hostname']
-    old_data.password = encrypt_aes(data["password"], str(read_yaml('aes_key', 'config')))
-    old_data.ip = data['ip']
+    old_data.hostname = item.hostname
+    old_data.ip = item.ip
+    old_data.password = encrypt_aes(item.password, str(read_yaml('aes_key', 'config')))
     try:
         await old_data.save()
     except Exception as e:

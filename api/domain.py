@@ -4,7 +4,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from models.first_domain import First_domain
 from .base import resp_200, resp_400
-from typing import List
+from typing import List, Optional
 
 domain = APIRouter()
 
@@ -39,7 +39,7 @@ class AddDomainModel(BaseModel):
     domain_manufacturer: str
     domain_account_key: str
     domain_account_secret: str
-    is_delete: bool = False
+    is_delete: Optional[bool] = False
 
 
 @domain.put('/add', summary='添加域名')
@@ -78,33 +78,25 @@ async def delete_domain(domain_id: int):
 
 class EditDomainModel(BaseModel):
     id: int
-    domain: str
-    domain_manufacturer: str
-    domain_account_key: str
-    domain_account_secret: str
-    is_delete: bool = False
+    domain: Optional[str]
+    domain_manufacturer: Optional[str]
+    domain_account_key: Optional[str]
+    domain_account_secret: Optional[str]
+    is_delete: Optional[bool]
 
 
 @domain.post('/edit', summary='编辑域名')
 async def edit_domain(item: EditDomainModel):
-    data = {
-        "id": item.id,
-        "domain": item.domain,
-        "domain_manufacturer": item.domain_manufacturer,
-        "domain_account_key": item.domain_account_key,
-        "domain_account_secret": item.domain_account_secret,
-        "is_delete": item.is_delete,
-    }
     try:
-        old_data = await First_domain.get(id=data['id'])
+        old_data = await First_domain.get(id=item.id)
     except Exception as e:
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='没有查到该条数据')
-    old_data.domain = data['domain']
-    old_data.domain_manufacturer = data['domain_manufacturer']
-    old_data.domain_account_key = data['domain_account_key']
-    old_data.domain_account_secret = data['domain_account_secret']
-    old_data.is_delete = data['is_delete']
+    old_data.domain = item.domain
+    old_data.domain_manufacturer = item.domain_manufacturer
+    old_data.domain_account_key = item.domain_account_key
+    old_data.domain_account_secret = item.domain_account_secret
+    old_data.is_delete = item.is_delete
     try:
         await old_data.save()
     except Exception as e:
