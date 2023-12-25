@@ -13,7 +13,7 @@ from api.event_startup import event_startup
 from api.server import server
 from api.ssl import ssl
 from settings import TORTOISE_ORM
-from test.test import test1
+from api.test import test1
 
 # 日志记录器
 logger = logging.getLogger()
@@ -52,7 +52,7 @@ register_tortoise(
     add_exception_handlers=True,  # 调试消息，生产环境不能开
 )
 
-app.include_router(test1, prefix='/api/test', tags=['测试接口'])
+# app.include_router(test1, prefix='/api/test', tags=['测试接口'])
 app.include_router(domain, prefix='/api/domain', tags=['域名'])
 app.include_router(server, prefix='/api/server', tags=['服务器'])
 app.include_router(ssl, prefix='/api/ssl', tags=['ssl证书'])
