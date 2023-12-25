@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter
 from pydantic import BaseModel
 from models.server import Server
-from tt_util.aes_util import encrypt_aes
+from tt_util.aes_util import encrypt_aes, decrypt_aes
 from tt_util.yaml_util import read_yaml
 from .base import resp_200, resp_400
 from typing import List, Optional
@@ -30,7 +30,13 @@ async def get_server():
         # 处理异常，可以打印或记录错误信息
         logging.error(f"Error fetching server: {e}")
         return resp_400(message='查询错误')
-    data_list = [ServerModelList.from_orm(server).dict() for server in servers]
+    # data_list = [ServerModelList.from_orm(server).dict() for server in servers]
+    data_list = []
+    for server in servers:
+        server_dict = ServerModelList.from_orm(server).dict()
+        # 在这里修改字段
+        server_dict['password'] = decrypt_aes(server_dict["password"], str(read_yaml('aes_key', 'config')))
+        data_list.append(server_dict)
     response_data = {
         'items': data_list,
         'total': len(data_list)
