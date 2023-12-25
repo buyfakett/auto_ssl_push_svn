@@ -30,8 +30,12 @@ async def get_domain():
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='查询错误')
     # 将数据库模型转换为响应模型
-    response_data = [DomainModelList.from_orm(domain).dict() for domain in domains]
-    return resp_200(data=response_data)
+    data_list = [DomainModelList.from_orm(domain).dict() for domain in domains]
+    response_data = {
+        'items': data_list,
+        'total': len(data_list)
+    }
+    return resp_200(data=response_data, message='查询成功')
 
 
 class AddDomainModel(BaseModel):
@@ -51,14 +55,21 @@ async def add_domain(item: AddDomainModel):
         "domain_account_secret": item.domain_account_secret,
         "is_delete": item.is_delete,
     }
-    if data['domain_manufacturer'] != 'ali':
+    if item.domain_manufacturer != 'ali':
         return resp_400(401, '暂时不支持该厂商域名')
     try:
-        await First_domain.create(**data)
+        add_data = await First_domain.create(**data)
     except Exception as e:
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='插入错误')
-    return resp_200(message='插入成功')
+    resp_data = {
+        'id': add_data.id,
+        'domain': add_data.domain,
+        'domain_manufacturer': add_data.domain_manufacturer,
+        'domain_account_secret': add_data.domain_account_secret,
+        'is_delete': add_data.is_delete,
+    }
+    return resp_200(data=resp_data, message='新增成功')
 
 
 @domain.delete('/delete/{domain_id}', summary='删除域名')
@@ -102,4 +113,13 @@ async def edit_domain(item: EditDomainModel):
     except Exception as e:
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='修改错误')
-    return resp_200(message='修改成功')
+    retrieved_data = await First_domain.get_or_none(id=item.id)  # 使用刚刚创建的数据的ID
+    resp_data = {
+        'id': retrieved_data.id,
+        'domain': retrieved_data.domain,
+        'domain_manufacturer': retrieved_data.domain_manufacturer,
+        'domain_account_key': retrieved_data.domain_account_key,
+        'domain_account_secret': retrieved_data.domain_account_secret,
+        'is_delete': retrieved_data.is_delete
+    }
+    return resp_200(data=resp_data, message='修改成功')

@@ -30,8 +30,12 @@ async def get_server():
         # 处理异常，可以打印或记录错误信息
         logging.error(f"Error fetching server: {e}")
         return resp_400(message='查询错误')
-    response_data = [ServerModelList.from_orm(server).dict() for server in servers]
-    return resp_200(data=response_data)
+    data_list = [ServerModelList.from_orm(server).dict() for server in servers]
+    response_data = {
+        'items': data_list,
+        'total': len(data_list)
+    }
+    return resp_200(data=response_data, message='查询成功')
 
 
 class AddServerModel(BaseModel):
@@ -49,11 +53,17 @@ async def add_server(item: AddServerModel):
     }
     data["password"] = encrypt_aes(data["password"], str(read_yaml('aes_key', 'config')))
     try:
-        await Server.create(**data)
+        add_data = await Server.create(**data)
     except Exception as e:
         logging.error(f"Error fetching server: {e}")
         return resp_400(message='插入错误')
-    return resp_200(message='插入成功')
+    resp_data = {
+        'id': add_data.id,
+        'hostname': add_data.hostname,
+        'ip': add_data.ip,
+        'password': add_data.password,
+    }
+    return resp_200(data=resp_data, message='新增成功')
 
 
 @server.delete('/delete/{server_id}', summary='删除服务器')
@@ -93,4 +103,11 @@ async def edit_server(item: EditServerModel):
     except Exception as e:
         logging.error(f"Error fetching server: {e}")
         return resp_400(message='修改错误')
-    return resp_200(message='修改成功')
+    retrieved_data = await Server.get_or_none(id=item.id)  # 使用刚刚创建的数据的ID
+    resp_data = {
+        'id': retrieved_data.id,
+        'hostname': retrieved_data.hostname,
+        'ip': retrieved_data.ip,
+        'password': retrieved_data.password,
+    }
+    return resp_200(data=resp_data, message='修改成功')
