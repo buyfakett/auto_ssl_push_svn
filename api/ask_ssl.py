@@ -5,10 +5,10 @@ import logging
 import os
 
 from api.base import resp_400
-from util.exec_shell import exec_shell
-from util.ssh import SSHClient
-from util.svn import SVNClient
-from util.yaml_util import read_yaml
+from tt_util.exec_shell import exec_shell
+from tt_util.ssh_util import SSHClient
+from tt_util.svn_util import SVNClient
+from tt_util.yaml_util import read_yaml
 
 
 def ask_ssl(aliyun_access_key: str, aliyun_access_secret: str, domain: str, hostname: str, server_host: str,

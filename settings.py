@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-            
 # @Author : buyfakett
 # @Time : 2023/11/13 15:35
-from util.yaml_util import read_yaml
+from tt_util.yaml_util import read_yaml
 
 TORTOISE_ORM = {
     'connections': {

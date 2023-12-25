@@ -3,8 +3,9 @@ import logging
 from fastapi import APIRouter
 from pydantic import BaseModel
 from models.server import Server
-from util.aes import encrypt_aes
-from util.yaml_util import read_yaml
+from models.ssl import Ssl
+from tt_util.aes_util import encrypt_aes
+from tt_util.yaml_util import read_yaml
 from .base import resp_200, resp_400
 from typing import List
 
@@ -68,6 +69,10 @@ async def delete_server(server_id: int):
     except Exception as e:
         logging.error(f"Error fetching server: {e}")
         return resp_400(message='删除错误')
+    try:
+        await Ssl.filter(server_id=server_id)
+    except:
+        pass
     return resp_200(message='删除成功')
 
 

@@ -7,11 +7,11 @@ import os, subprocess
 from fastapi import APIRouter
 
 from api.ask_ssl import ask_ssl
-from util.svn import SVNClient
-from util.exec_shell import exec_shell
-from util.yaml_util import read_yaml
+from tt_util.svn_util import SVNClient
+from tt_util.exec_shell import exec_shell
+from tt_util.yaml_util import read_yaml
 from api.base import resp_200, resp_400
-from util.ssh import SSHClient
+from tt_util.ssh_util import SSHClient
 
 test1 = APIRouter()
 
