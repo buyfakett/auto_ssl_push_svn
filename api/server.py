@@ -30,7 +30,6 @@ async def get_server():
         # 处理异常，可以打印或记录错误信息
         logging.error(f"Error fetching server: {e}")
         return resp_400(message='查询错误')
-    # data_list = [ServerModelList.from_orm(server).dict() for server in servers]
     data_list = []
     for server in servers:
         server_dict = ServerModelList.from_orm(server).dict()
