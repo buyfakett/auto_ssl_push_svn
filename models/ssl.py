@@ -4,7 +4,7 @@ from tortoise import fields
 
 class Ssl(Model):
     id = fields.IntField(pk=True)
-    domain_id = fields.IntField(description="域名id")
+    first_domain_id = fields.IntField(description="域名id")
     server_id = fields.IntField(description="服务器id")
     certificate_domain = fields.CharField(max_length=255, description="证书域名")
     webroot = fields.CharField(max_length=255, description="SVN路径")

@@ -13,7 +13,7 @@ server = APIRouter()
 
 class ServerModelList(BaseModel):
     id: int
-    ssl_id: Optional[int]
+    ssl_id: Optional[str]
     hostname: str
     ip: str
     password: str
