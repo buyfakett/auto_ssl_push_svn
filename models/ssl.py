@@ -10,5 +10,5 @@ class Ssl(Model):
     webroot = fields.CharField(max_length=255, description="SVN路径")
     register_time = fields.DateField(description="证书注册时间", null=True)
     exp_time = fields.DateField(description="证书到期时间", null=True)
-    status = fields.IntField(description="证书状态 0-不进行续期，1-正常，2-过期")
+    status = fields.IntField(description="证书状态 0-不进行续期，1-正常，2-新建/过期")
 

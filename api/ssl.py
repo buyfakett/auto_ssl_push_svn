@@ -48,7 +48,7 @@ class AddSslModel(BaseModel):
     server_id: int
     certificate_domain: str
     webroot: str
-    status: int = 2
+    status: Optional[int] = 2
 
 
 @ssl.put('/add', summary='添加证书')
@@ -61,12 +61,12 @@ async def add_ssl(item: AddSslModel):
         "status": item.status,
     }
     try:
-        await First_domain.get(id=data['first_domain'])
+        await First_domain.get(id=item.first_domain_id)
     except Exception as e:
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='没有这个一级域名')
     try:
-        await Server.get(id=data['server_id'])
+        await Server.get(id=item.server_id)
     except Exception as e:
         logging.error(f"Error fetching server: {e}")
         return resp_400(message='没有这个服务器')
@@ -117,6 +117,16 @@ async def edit_ssl(item: EditSslModel):
     except Exception as e:
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='没有查到该条数据')
+    try:
+        await First_domain.get(id=item.first_domain_id)
+    except Exception as e:
+        logging.error(f"Error fetching domains: {e}")
+        return resp_400(message='没有这个一级域名')
+    try:
+        await Server.get(id=item.server_id)
+    except Exception as e:
+        logging.error(f"Error fetching server: {e}")
+        return resp_400(message='没有这个服务器')
     old_data.first_domain_id = item.first_domain_id
     old_data.server_id = item.server_id
     old_data.certificate_domain = item.certificate_domain
