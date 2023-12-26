@@ -6,7 +6,7 @@ import os, subprocess
 
 from fastapi import APIRouter
 
-from api.ask_ssl import ask_ssl
+from api.ask_ssl import SslFunction
 from tt_util.svn_util import SVNClient
 from tt_util.exec_shell import exec_shell
 from tt_util.yaml_util import read_yaml
@@ -84,5 +84,6 @@ async def upload_svn():
 
 @test1.get('/ask_ssl')
 async def test_ask_ssl(aliyun_access_key: str, aliyun_access_secret: str, domain: str, hostname: str):
-    ask_ssl(aliyun_access_key, aliyun_access_secret, domain, hostname)
+    ask_ssl = SslFunction()
+    ask_ssl.ask_ssl(aliyun_access_key, aliyun_access_secret, domain, hostname)
     return resp_200()
