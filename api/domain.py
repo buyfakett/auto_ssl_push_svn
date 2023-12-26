@@ -2,7 +2,7 @@ import logging
 
 from fastapi import APIRouter
 from pydantic import BaseModel
-from models.first_domain import First_domain
+from models.first_domain import domain as Domain
 from .base import resp_200, resp_400
 from typing import List, Optional
 
@@ -24,7 +24,7 @@ class DomainModelList(BaseModel):
 @domain.get('/list', response_model=List[DomainModelList], summary='获取域名列表')
 async def get_domain():
     try:
-        domains = await First_domain.filter(is_delete=False).order_by('id')
+        domains = await Domain.filter(is_delete=False).order_by('id')
     except Exception as e:
         # 处理异常，可以打印或记录错误信息
         logging.error(f"Error fetching domains: {e}")
@@ -58,7 +58,7 @@ async def add_domain(item: AddDomainModel):
     if item.domain_manufacturer != 'ali':
         return resp_400(401, '暂时不支持该厂商域名')
     try:
-        add_data = await First_domain.create(**data)
+        add_data = await Domain.create(**data)
     except Exception as e:
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='插入错误')
@@ -75,12 +75,12 @@ async def add_domain(item: AddDomainModel):
 @domain.delete('/delete/{domain_id}', summary='删除域名')
 async def delete_domain(domain_id: int):
     try:
-        await First_domain.get(id=domain_id)
+        await Domain.get(id=domain_id)
     except Exception as e:
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='没有这条数据')
     try:
-        await First_domain.filter(id=domain_id).delete()
+        await Domain.filter(id=domain_id).delete()
     except Exception as e:
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='删除错误')
@@ -101,7 +101,7 @@ async def edit_domain(item: EditDomainModel):
     if item.domain_manufacturer != 'ali':
         return resp_400(401, '暂时不支持该厂商域名')
     try:
-        old_data = await First_domain.get(id=item.id)
+        old_data = await Domain.get(id=item.id)
     except Exception as e:
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='没有查到该条数据')
@@ -115,7 +115,7 @@ async def edit_domain(item: EditDomainModel):
     except Exception as e:
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='修改错误')
-    retrieved_data = await First_domain.get_or_none(id=item.id)  # 使用刚刚创建的数据的ID
+    retrieved_data = await Domain.get_or_none(id=item.id)  # 使用刚刚创建的数据的ID
     resp_data = {
         'id': retrieved_data.id,
         'domain': retrieved_data.domain,

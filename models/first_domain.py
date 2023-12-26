@@ -2,7 +2,7 @@ from tortoise.models import Model
 from tortoise import fields
 
 
-class First_domain(Model):
+class domain(Model):
     id = fields.IntField(pk=True)
     domain = fields.CharField(max_length=255, description="域名")
     domain_manufacturer = fields.CharField(max_length=50, description="域名厂商")

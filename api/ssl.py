@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter
 from pydantic import BaseModel
 from models.ssl import Ssl
-from models.first_domain import First_domain
+from models.first_domain import domain
 from models.server import Server
 from .base import resp_200, resp_400
 from typing import List, Optional
@@ -61,7 +61,7 @@ async def add_ssl(item: AddSslModel):
         "status": item.status,
     }
     try:
-        await First_domain.get(id=item.first_domain_id)
+        await domain.get(id=item.first_domain_id)
     except Exception as e:
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='没有这个一级域名')
@@ -77,7 +77,7 @@ async def add_ssl(item: AddSslModel):
         return resp_400(message='插入错误')
     resp_data = {
         'id': add_data.id,
-        'first_domain_id': add_data.first_domain_id,
+        'first_domain_id': add_data.domain_id,
         'server_id': add_data.server_id,
         'certificate_domain': add_data.certificate_domain,
         'webroot': add_data.webroot,
@@ -118,7 +118,7 @@ async def edit_ssl(item: EditSslModel):
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='没有查到该条数据')
     try:
-        await First_domain.get(id=item.first_domain_id)
+        await domain.get(id=item.first_domain_id)
     except Exception as e:
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='没有这个一级域名')
@@ -140,7 +140,7 @@ async def edit_ssl(item: EditSslModel):
     retrieved_data = await Ssl.get_or_none(id=item.id)  # 使用刚刚创建的数据的ID
     resp_data = {
         'id': retrieved_data.id,
-        'first_domain_id': retrieved_data.first_domain_id,
+        'first_domain_id': retrieved_data.domain_id,
         'server_id': retrieved_data.server_id,
         'certificate_domain': retrieved_data.certificate_domain,
         'webroot': retrieved_data.webroot,
