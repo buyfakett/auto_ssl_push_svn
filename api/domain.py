@@ -98,6 +98,8 @@ class EditDomainModel(BaseModel):
 
 @domain.post('/edit', summary='编辑域名')
 async def edit_domain(item: EditDomainModel):
+    if item.domain_manufacturer != 'ali':
+        return resp_400(401, '暂时不支持该厂商域名')
     try:
         old_data = await First_domain.get(id=item.id)
     except Exception as e:
