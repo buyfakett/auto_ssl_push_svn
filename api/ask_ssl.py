@@ -14,10 +14,16 @@ from tt_util.yaml_util import read_yaml
 class SslFunction(object):
     def __init__(self, aliyun_access_key=read_yaml('aliyun_access_key', 'config'),
                  aliyun_access_secret=read_yaml('aliyun_access_secret', 'config'),
-                 repo_url=read_yaml('repo_url', 'config'),):
+                 repo_url=read_yaml('repo_url', 'config'),
+                 svn_user=read_yaml('svn_user', 'config'),
+                 svn_passwd=read_yaml('svn_passwd', 'config'),
+                 mail=read_yaml('mail', 'config')):
         self.aliyun_access_key = aliyun_access_key
         self.aliyun_access_secret = aliyun_access_secret
         self.repo_url = repo_url
+        self.svn_user = svn_user
+        self.svn_passwd = svn_passwd
+        self.mail = mail
 
     def ask_ssl(self, domain: str, hostname: str, server_host: str, server_password: str):
         """
@@ -26,9 +32,7 @@ class SslFunction(object):
         :param hostname:                hostname
         :param server_host:             ip
         :param server_password:         密码
-        :return:
         """
-        mail = read_yaml('mail', 'config')
         # 上传配置文件
         with open('./temp/' + 'credentials.ini', encoding="utf-8", mode="a") as f:
             f.write(f'dns_aliyun_access_key = {self.aliyun_access_key}\n')
@@ -51,7 +55,7 @@ class SslFunction(object):
             f.write('-v /auto_ssl_push_svn/log/:/var/log/letsencrypt/ \\\n')
             f.write('registry.cn-hangzhou.aliyuncs.com/buyfakett/certbot-dns-aliyun \\\n')
             f.write("certonly --authenticator=dns-aliyun --dns-aliyun-credentials='/data/credentials.ini' \\\n")
-            f.write(f' -d {domain} -m {mail} \\\n')
+            f.write(f' -d {domain} -m {self.mail} \\\n')
             f.write('--non-interactive \\\n')
             f.write('--agree-tos \\\n')
             f.write('--preferred-challenges dns \\\n')
@@ -65,8 +69,7 @@ class SslFunction(object):
         os.remove(os.getcwd() + '/temp/setup.sh')
         # 上传至svn
         svn_client = SVNClient(repo_url=self.repo_url, working_copy_path=os.getcwd() + '/temp/svn',
-                               username=read_yaml('svn_user', 'config'),
-                               password=read_yaml('svn_passwd', 'config'))
+                               username=self.svn_user, password=self.svn_passwd)
         checkout_output, checkout_error, checkout_code = svn_client.checkout()
         logging.info(f'检出日志: {checkout_output}')
         logging.error(f'检出错误: {checkout_error}')
@@ -74,6 +77,7 @@ class SslFunction(object):
         delete_svn_temp = 'rm -rf ' + os.getcwd() + '/temp/svn'
 
         ssh = SSHClient(host=server_host, password=server_password)
+        # 判断是否是泛域名，如果是泛域名生成的文件夹是不带*的
         if not domain.startswith('*'):
             if not ssh.wait_for_file(f'/etc/letsencrypt/live/{domain}/cert.pem'):
                 # 在文件存在时执行你的代码
