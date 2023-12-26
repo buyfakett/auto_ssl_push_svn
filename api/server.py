@@ -66,7 +66,7 @@ async def add_server(item: AddServerModel):
         'id': add_data.id,
         'hostname': add_data.hostname,
         'ip': add_data.ip,
-        'password': add_data.password,
+        'password': item.password,
     }
     return resp_200(data=resp_data, message='新增成功')
 
@@ -113,6 +113,6 @@ async def edit_server(item: EditServerModel):
         'id': retrieved_data.id,
         'hostname': retrieved_data.hostname,
         'ip': retrieved_data.ip,
-        'password': retrieved_data.password,
+        'password': item.password,
     }
     return resp_200(data=resp_data, message='修改成功')
