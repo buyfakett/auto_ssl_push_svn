@@ -89,11 +89,11 @@ async def delete_domain(domain_id: int):
 
 class EditDomainModel(BaseModel):
     id: int
-    domain: Optional[str]
-    domain_manufacturer: Optional[str]
-    domain_account_key: Optional[str]
-    domain_account_secret: Optional[str]
-    is_delete: Optional[bool]
+    domain: str
+    domain_manufacturer: str
+    domain_account_key: str
+    domain_account_secret: str
+    is_delete: bool
 
 
 @domain.post('/edit', summary='编辑域名')

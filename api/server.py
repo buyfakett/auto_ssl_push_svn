@@ -13,7 +13,7 @@ server = APIRouter()
 
 class ServerModelList(BaseModel):
     id: int
-    ssl_id: Optional[str]
+    ssl_id: Optional[List[int]]
     hostname: str
     ip: str
     password: str
@@ -45,6 +45,7 @@ async def get_server():
 
 
 class AddServerModel(BaseModel):
+    ssl_id: Optional[List[int]] = None
     hostname: str
     ip: str
     password: str
@@ -91,9 +92,10 @@ async def delete_server(server_id: int):
 
 class EditServerModel(BaseModel):
     id: int
-    hostname: Optional[str]
-    ip: Optional[str]
-    password: Optional[str]
+    ssl_id: Optional[List[int]] = None
+    hostname: str
+    ip: str
+    password: str
 
 
 @server.post('/edit', summary='编辑服务器')

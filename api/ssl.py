@@ -103,11 +103,11 @@ async def delete_ssl(ssl_id: int):
 
 class EditSslModel(BaseModel):
     id: int
-    first_domain_id: Optional[int]
-    server_id: Optional[int]
-    certificate_domain: Optional[str]
-    webroot: Optional[str]
-    status: Optional[int]
+    first_domain_id: int
+    server_id: int
+    certificate_domain: str
+    webroot: str
+    status: int
 
 
 @ssl.post('/edit', summary='编辑证书')
