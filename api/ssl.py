@@ -16,8 +16,8 @@ class SslModelList(BaseModel):
     id: int
     first_domain_id: int
     server_id: int
+    server_ids: List[int]
     certificate_domain: str
-    webroot: str
     register_time: Optional[datetime]
     exp_time: Optional[datetime]
     status: int
@@ -46,8 +46,8 @@ async def get_ssl():
 class AddSslModel(BaseModel):
     first_domain_id: int
     server_id: int
+    server_ids: List[int]
     certificate_domain: str
-    webroot: str
     status: Optional[int] = 2
 
 
@@ -56,8 +56,8 @@ async def add_ssl(item: AddSslModel):
     data = {
         "first_domain_id": item.first_domain_id,
         "server_id": item.server_id,
+        "server_ids": item.server_ids,
         "certificate_domain": item.certificate_domain,
-        "webroot": item.webroot,
         "status": item.status,
     }
     try:
@@ -70,20 +70,25 @@ async def add_ssl(item: AddSslModel):
     except Exception as e:
         logging.error(f"Error fetching server: {e}")
         return resp_400(message='没有这个服务器')
-    try:
-        add_data = await Ssl.create(**data)
-    except Exception as e:
-        logging.error(f"Error fetching ssl: {e}")
-        return resp_400(message='插入错误')
-    resp_data = {
-        'id': add_data.id,
-        'first_domain_id': add_data.first_domain_id,
-        'server_id': add_data.server_id,
-        'certificate_domain': add_data.certificate_domain,
-        'webroot': add_data.webroot,
-        'status': add_data.status,
-    }
-    return resp_200(data=resp_data, message='新增成功')
+    existing_ids = await Server.filter(id__in=item.server_ids).values_list('id', flat=True)
+    if len(existing_ids) != len(item.server_ids):
+        # 如果查询出来的 ID 数量和待查询的 ID 数量相等，说明所有 ID 都存在
+        return resp_400(message='服务器的数组错误')
+    else:
+        try:
+            add_data = await Ssl.create(**data)
+        except Exception as e:
+            logging.error(f"Error fetching ssl: {e}")
+            return resp_400(message='插入错误')
+        resp_data = {
+            'id': add_data.id,
+            'first_domain_id': add_data.first_domain_id,
+            'server_id': add_data.server_id,
+            'server_ids': add_data.server_ids,
+            'certificate_domain': add_data.certificate_domain,
+            'status': add_data.status,
+        }
+        return resp_200(data=resp_data, message='新增成功')
 
 
 @ssl.delete('/delete/{ssl_id}', summary='删除证书')
@@ -105,8 +110,8 @@ class EditSslModel(BaseModel):
     id: int
     first_domain_id: int
     server_id: int
+    server_ids: List[int]
     certificate_domain: str
-    webroot: str
     status: int
 
 
@@ -130,7 +135,7 @@ async def edit_ssl(item: EditSslModel):
     old_data.first_domain_id = item.first_domain_id
     old_data.server_id = item.server_id
     old_data.certificate_domain = item.certificate_domain
-    old_data.webroot = item.webroot
+    old_data.server_ids = item.server_ids
     old_data.status = item.status
     try:
         await old_data.save()
@@ -142,8 +147,8 @@ async def edit_ssl(item: EditSslModel):
         'id': retrieved_data.id,
         'first_domain_id': retrieved_data.first_domain_id,
         'server_id': retrieved_data.server_id,
+        'server_ids': retrieved_data.server_ids,
         'certificate_domain': retrieved_data.certificate_domain,
-        'webroot': retrieved_data.webroot,
         'status': retrieved_data.status
     }
     return resp_200(data=resp_data, message='修改成功')

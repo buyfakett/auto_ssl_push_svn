@@ -42,7 +42,6 @@ class SslFunction(object):
             ssh.upload_file(os.getcwd() + '/temp/credentials.ini', '/auto_ssl_push_svn/credentials.ini')
         except Exception as e:
             logging.error(e)
-            logging.error('上传配置文件失败')
             return resp_400(message='上传配置文件失败')
         os.remove(os.getcwd() + '/temp/credentials.ini')
         logging.info('上传配置文件成功')
@@ -64,7 +63,6 @@ class SslFunction(object):
             ssh.upload_and_execute_script(os.getcwd() + '/temp/setup.sh', '/auto_ssl_push_svn/setup.sh')
         except Exception as e:
             logging.error(e)
-            logging.error('上传/执行失败')
             return resp_400(message='上传/执行失败')
         ssh.close()
         os.remove(os.getcwd() + '/temp/setup.sh')
@@ -95,7 +93,6 @@ class SslFunction(object):
             if not ssh.wait_for_file(f'/etc/letsencrypt/live/{domain}/cert.pem'):
                 # 在文件存在时执行你的代码
                 exec_shell(delete_svn_temp)
-                logging.error(f'申请{domain}失败')
                 return resp_400(message=f'申请{domain}失败')
             ssh.download_file(f'/etc/letsencrypt/live/{domain}/cert.pem',
                               os.getcwd() + f'/temp/svn/{hostname}/ssl/{domain}.cer')
@@ -112,7 +109,6 @@ class SslFunction(object):
             if not ssh.wait_for_file(f'/etc/letsencrypt/live/{domain[2:]}/cert.pem'):
                 # 在文件存在时执行你的代码
                 exec_shell(delete_svn_temp)
-                logging.error(f'申请{domain}失败')
                 return resp_400(message=f'申请{domain}失败')
             ssh.download_file(f'/etc/letsencrypt/live/{domain[2:]}/cert.pem',
                               os.getcwd() + f'/temp/svn/{hostname}/ssl/_{domain[1:]}.cer')

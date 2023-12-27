@@ -13,7 +13,7 @@ server = APIRouter()
 
 class ServerModelList(BaseModel):
     id: int
-    ssl_id: Optional[List[int]]
+    webroot: str
     hostname: str
     ip: str
     password: str
@@ -45,7 +45,7 @@ async def get_server():
 
 
 class AddServerModel(BaseModel):
-    ssl_id: Optional[List[int]] = None
+    webroot: str
     hostname: str
     ip: str
     password: str
@@ -54,7 +54,7 @@ class AddServerModel(BaseModel):
 @server.put('/add', summary='添加服务器')
 async def add_server(item: AddServerModel):
     data = {
-        "ssl_id": item.ssl_id,
+        "webroot": item.webroot,
         "hostname": item.hostname,
         "ip": item.ip,
         "password": item.password,
@@ -67,7 +67,7 @@ async def add_server(item: AddServerModel):
         return resp_400(message='插入错误')
     resp_data = {
         'id': add_data.id,
-        "ssl_id": add_data.ssl_id,
+        "webroot": add_data.webroot,
         'hostname': add_data.hostname,
         'ip': add_data.ip,
         'password': item.password,
@@ -92,7 +92,7 @@ async def delete_server(server_id: int):
 
 class EditServerModel(BaseModel):
     id: int
-    ssl_id: Optional[List[int]] = None
+    webroot: str
     hostname: str
     ip: str
     password: str
@@ -107,7 +107,7 @@ async def edit_server(item: EditServerModel):
         return resp_400(message='没有查到该条数据')
     old_data.hostname = item.hostname
     old_data.ip = item.ip
-    old_data.ssl_id = item.ssl_id
+    old_data.webroot = item.webroot
     old_data.password = encrypt_aes(item.password, str(read_yaml('aes_key', 'config')))
     try:
         await old_data.save()
@@ -117,7 +117,7 @@ async def edit_server(item: EditServerModel):
     retrieved_data = await Server.get_or_none(id=item.id)  # 使用刚刚创建的数据的ID
     resp_data = {
         'id': retrieved_data.id,
-        "ssl_id": retrieved_data.ssl_id,
+        "webroot": retrieved_data.webroot,
         'hostname': retrieved_data.hostname,
         'ip': retrieved_data.ip,
         'password': item.password,
