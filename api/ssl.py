@@ -2,6 +2,8 @@ import logging
 
 from fastapi import APIRouter
 from pydantic import BaseModel
+from tt_util.check_domain import check_domain
+
 from models.ssl import Ssl
 from models.first_domain import first_domain
 from models.server import Server
@@ -74,21 +76,23 @@ async def add_ssl(item: AddSslModel):
     if len(existing_ids) != len(item.server_ids):
         # 如果查询出来的 ID 数量和待查询的 ID 数量相等，说明所有 ID 都存在
         return resp_400(message='服务器的数组错误')
-    else:
-        try:
-            add_data = await Ssl.create(**data)
-        except Exception as e:
-            logging.error(f"Error fetching ssl: {e}")
-            return resp_400(message='插入错误')
-        resp_data = {
-            'id': add_data.id,
-            'first_domain_id': add_data.first_domain_id,
-            'server_id': add_data.server_id,
-            'server_ids': add_data.server_ids,
-            'certificate_domain': add_data.certificate_domain,
-            'status': add_data.status,
-        }
-        return resp_200(data=resp_data, message='新增成功')
+    # 判断域名是否解析到服务器
+    if not check_domain(item.certificate_domain):
+        return resp_400(message='域名没有解析到服务器')
+    try:
+        add_data = await Ssl.create(**data)
+    except Exception as e:
+        logging.error(f"Error fetching ssl: {e}")
+        return resp_400(message='插入错误')
+    resp_data = {
+        'id': add_data.id,
+        'first_domain_id': add_data.first_domain_id,
+        'server_id': add_data.server_id,
+        'server_ids': add_data.server_ids,
+        'certificate_domain': add_data.certificate_domain,
+        'status': add_data.status,
+    }
+    return resp_200(data=resp_data, message='新增成功')
 
 
 @ssl.delete('/delete/{ssl_id}', summary='删除证书')
@@ -132,6 +136,13 @@ async def edit_ssl(item: EditSslModel):
     except Exception as e:
         logging.error(f"Error fetching server: {e}")
         return resp_400(message='没有这个服务器')
+    existing_ids = await Server.filter(id__in=item.server_ids).values_list('id', flat=True)
+    if len(existing_ids) != len(item.server_ids):
+        # 如果查询出来的 ID 数量和待查询的 ID 数量相等，说明所有 ID 都存在
+        return resp_400(message='服务器的数组错误')
+    # 判断域名是否解析到服务器
+    if not check_domain(item.certificate_domain):
+        return resp_400(message='域名没有解析到服务器')
     old_data.first_domain_id = item.first_domain_id
     old_data.server_id = item.server_id
     old_data.certificate_domain = item.certificate_domain

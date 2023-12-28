@@ -1,3 +1,4 @@
+dnspython==2.4.2
 tt_util
 aerich==0.7.2
 aiosqlite==0.17.0
