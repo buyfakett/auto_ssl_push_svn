@@ -64,11 +64,10 @@ class SslFunction(object):
         # 判断是否是泛域名，如果是泛域名生成的文件夹是不带*的
         if not domain.startswith('*'):
             if not check_file(f'/etc/letsencrypt/live/{domain}', 'cert*.pem'):
-                resp_400(message='没有成功申请证书')
+                return resp_400(message='没有成功申请证书')
         else:
             if not check_file(f'/etc/letsencrypt/live/{domain[2:]}', 'cert*.pem'):
-                resp_400(message='没有成功申请证书')
-        return True
+                return resp_400(message='没有成功申请证书')
 
     def upload_svn(self, hostname: str, repo_url: str, domain: str, server_host: str, server_password: str):
         """
