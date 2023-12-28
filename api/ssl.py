@@ -11,6 +11,8 @@ from .base import resp_200, resp_400
 from typing import List, Optional
 from datetime import datetime
 
+from .db_ask_ssl import db_ask_ssl
+
 ssl = APIRouter()
 
 
@@ -163,3 +165,9 @@ async def edit_ssl(item: EditSslModel):
         'status': retrieved_data.status
     }
     return resp_200(data=resp_data, message='修改成功')
+
+
+@ssl.post('/refresh', summary='刷新证书')
+async def refresh_ssl():
+    await db_ask_ssl()
+    return resp_200()
