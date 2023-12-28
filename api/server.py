@@ -88,7 +88,7 @@ async def edit_server(item: EditServerModel):
         logging.error(f"Error fetching server: {e}")
         return resp_400(message='没有查到该条数据')
     old_data.hostname = item.hostname
-    old_data.ip = item.ip
+    old_data.webroot = item.webroot
     try:
         await old_data.save()
     except Exception as e:

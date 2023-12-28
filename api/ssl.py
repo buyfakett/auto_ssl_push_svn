@@ -19,7 +19,6 @@ ssl = APIRouter()
 class SslModelList(BaseModel):
     id: int
     first_domain_id: int
-    server_id: int
     server_ids: List[int]
     certificate_domain: str
     register_time: Optional[datetime]
@@ -49,7 +48,6 @@ async def get_ssl():
 
 class AddSslModel(BaseModel):
     first_domain_id: int
-    server_id: int
     server_ids: List[int]
     certificate_domain: str
     status: Optional[int] = 2
@@ -59,7 +57,6 @@ class AddSslModel(BaseModel):
 async def add_ssl(item: AddSslModel):
     data = {
         "first_domain_id": item.first_domain_id,
-        "server_id": item.server_id,
         "server_ids": item.server_ids,
         "certificate_domain": item.certificate_domain,
         "status": item.status,
@@ -69,11 +66,6 @@ async def add_ssl(item: AddSslModel):
     except Exception as e:
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='没有这个一级域名')
-    try:
-        await Server.get(id=item.server_id)
-    except Exception as e:
-        logging.error(f"Error fetching server: {e}")
-        return resp_400(message='没有这个服务器')
     existing_ids = await Server.filter(id__in=item.server_ids).values_list('id', flat=True)
     if len(existing_ids) != len(item.server_ids):
         # 如果查询出来的 ID 数量和待查询的 ID 数量相等，说明所有 ID 都存在
@@ -89,7 +81,6 @@ async def add_ssl(item: AddSslModel):
     resp_data = {
         'id': add_data.id,
         'first_domain_id': add_data.first_domain_id,
-        'server_id': add_data.server_id,
         'server_ids': add_data.server_ids,
         'certificate_domain': add_data.certificate_domain,
         'status': add_data.status,
@@ -115,7 +106,6 @@ async def delete_ssl(ssl_id: int):
 class EditSslModel(BaseModel):
     id: int
     first_domain_id: int
-    server_id: int
     server_ids: List[int]
     certificate_domain: str
     status: int
@@ -133,11 +123,6 @@ async def edit_ssl(item: EditSslModel):
     except Exception as e:
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='没有这个一级域名')
-    try:
-        await Server.get(id=item.server_id)
-    except Exception as e:
-        logging.error(f"Error fetching server: {e}")
-        return resp_400(message='没有这个服务器')
     existing_ids = await Server.filter(id__in=item.server_ids).values_list('id', flat=True)
     if len(existing_ids) != len(item.server_ids):
         # 如果查询出来的 ID 数量和待查询的 ID 数量相等，说明所有 ID 都存在
@@ -146,7 +131,6 @@ async def edit_ssl(item: EditSslModel):
     if not check_domain(item.certificate_domain):
         return resp_400(message='域名没有解析到服务器')
     old_data.first_domain_id = item.first_domain_id
-    old_data.server_id = item.server_id
     old_data.certificate_domain = item.certificate_domain
     old_data.server_ids = item.server_ids
     old_data.status = item.status
@@ -159,7 +143,6 @@ async def edit_ssl(item: EditSslModel):
     resp_data = {
         'id': retrieved_data.id,
         'first_domain_id': retrieved_data.first_domain_id,
-        'server_id': retrieved_data.server_id,
         'server_ids': retrieved_data.server_ids,
         'certificate_domain': retrieved_data.certificate_domain,
         'status': retrieved_data.status

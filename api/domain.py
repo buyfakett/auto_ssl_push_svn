@@ -71,6 +71,7 @@ async def add_domain(item: AddDomainModel):
         'id': add_data.id,
         'domain': add_data.domain,
         'domain_manufacturer': add_data.domain_manufacturer,
+        "domain_account_key": item.domain_account_key,
         'domain_account_secret': add_data.domain_account_secret,
         'is_delete': add_data.is_delete,
     }
