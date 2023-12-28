@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-            
 # @Author : buyfakett
 # @Time : 2023/12/28 15:09
+import ast
 from datetime import datetime
 
 from tt_util.aes_util import decrypt_aes
@@ -33,7 +34,8 @@ async def db_ask_ssl():
                             domain=ssl_data.certificate_domain,
                             server_host=server_data.ip,
                             server_password=decrypt_aes(server_data.password, str(read_yaml('aes_key', 'config'))))
-            servers = await Server.filter(id__in=ssl_data.server_ids)
+            list_server = ast.literal_eval(ssl_data.server_ids)
+            servers = await Server.filter(id__in=list_server)
             for server in servers:
                 # 分发证书
                 ask_ssl.upload_svn(hostname=server.hostname,
