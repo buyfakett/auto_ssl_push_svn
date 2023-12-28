@@ -50,9 +50,13 @@ class SslFunction(object):
             f.write('--preferred-challenges dns \\\n')
             f.write("--manual-cleanup-hook 'aliyun-dns clean'")
         # 复制配置文件到运行目录
-        exec_shell('mkdir /auto_ssl_push_svn')
-        exec_shell('cp ' + os.getcwd() + '/temp/credentials.ini /auto_ssl_push_svn')
-        exec_shell('cp ' + os.getcwd() + '/temp/setup.sh /auto_ssl_push_svn')
+        # exec_shell('mkdir /auto_ssl_push_svn')
+        # exec_shell('cp ' + os.getcwd() + '/temp/credentials.ini /auto_ssl_push_svn')
+        # exec_shell('cp ' + os.getcwd() + '/temp/setup.sh /auto_ssl_push_svn')
+        ssh = SSHClient(host=read_yaml('server_host', 'config'), password=read_yaml('server_password', 'config'))
+        ssh.execute_command('mkdir /auto_ssl_push_svn')
+        ssh.upload_file(os.getcwd() + '/temp/credentials.ini', '/auto_ssl_push_svn/credentials.ini')
+        ssh.upload_and_execute_script(os.getcwd() + '/temp/setup.sh', '/auto_ssl_push_svn/setup.sh')
         os.remove(os.getcwd() + '/temp/credentials.ini')
         os.remove(os.getcwd() + '/temp/setup.sh')
         # 运行申请证书容器
