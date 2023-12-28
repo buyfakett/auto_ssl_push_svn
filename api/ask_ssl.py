@@ -94,9 +94,9 @@ class SslFunction(object):
                 # 在文件存在时执行你的代码
                 exec_shell(delete_svn_temp)
                 return resp_400(message=f'申请{domain}失败')
-            ssh.download_file(f'/etc/letsencrypt/live/{domain}/cert.pem',
+            ssh.download_file(f'/etc/letsencrypt/live/{domain}/cert*.pem',
                               os.getcwd() + f'/temp/svn/{hostname}/ssl/{domain}.cer')
-            ssh.download_file(f'/etc/letsencrypt/live/{domain}/privkey.pem',
+            ssh.download_file(f'/etc/letsencrypt/live/{domain}/privkey*.pem',
                               os.getcwd() + f'/temp/svn/{hostname}/ssl/{domain}.key')
             logging.info(f'申请{domain}成功')
 
@@ -110,9 +110,9 @@ class SslFunction(object):
                 # 在文件存在时执行你的代码
                 exec_shell(delete_svn_temp)
                 return resp_400(message=f'申请{domain}失败')
-            ssh.download_file(f'/etc/letsencrypt/live/{domain[2:]}/cert.pem',
+            ssh.download_file(f'/etc/letsencrypt/live/{domain[2:]}/cert*.pem',
                               os.getcwd() + f'/temp/svn/{hostname}/ssl/_{domain[1:]}.cer')
-            ssh.download_file(f'/etc/letsencrypt/live/{domain[2:]}/privkey.pem',
+            ssh.download_file(f'/etc/letsencrypt/live/{domain[2:]}/privkey*.pem',
                               os.getcwd() + f'/temp/svn/{hostname}/ssl/_{domain[1:]}.key')
             logging.info(f'申请{domain}成功')
 
