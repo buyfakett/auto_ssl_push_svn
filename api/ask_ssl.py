@@ -90,13 +90,13 @@ class SslFunction(object):
 
         # 判断是否是泛域名，如果是泛域名生成的文件夹是不带*的
         if not domain.startswith('*'):
-            exec_shell(f'cp /etc/letsencrypt/live/{domain}/cert*.pem /temp/svn/{hostname}/ssl/{domain}.cer')
-            exec_shell(f'cp /etc/letsencrypt/live/{domain}/privkey*.pem /temp/svn/{hostname}/ssl/{domain}.key')
+            exec_shell(f'cp /etc/letsencrypt/live/{domain}/cert*.pem /app/temp/svn/{hostname}/ssl/{domain}.cer')
+            exec_shell(f'cp /etc/letsencrypt/live/{domain}/privkey*.pem /app/temp/svn/{hostname}/ssl/{domain}.key')
             svn_client.add(f"/app/temp/svn/{hostname}/ssl/{domain}.key")
             svn_client.add(f"/app/temp/svn/{hostname}/ssl/{domain}.cer")
         else:
-            exec_shell(f'cp /etc/letsencrypt/live/{domain[2:]}/cert*.pem /temp/svn/{hostname}/ssl/_{domain[1:]}.cer')
-            exec_shell(f'cp /etc/letsencrypt/live/{domain[2:]}/privkey*.pem /temp/svn/{hostname}/ssl/_{domain[1:]}.key')
+            exec_shell(f'cp /etc/letsencrypt/live/{domain[2:]}/cert*.pem /app/temp/svn/{hostname}/ssl/_{domain[1:]}.cer')
+            exec_shell(f'cp /etc/letsencrypt/live/{domain[2:]}/privkey*.pem /app/temp/svn/{hostname}/ssl/_{domain[1:]}.key')
             svn_client.add(f"/app/temp/svn/{hostname}/ssl/_{domain[1:]}.key")
             svn_client.add(f"/app/temp/svn/{hostname}/ssl/_{domain[1:]}.cer")
 
