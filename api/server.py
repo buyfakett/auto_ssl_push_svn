@@ -3,10 +3,8 @@ import logging
 from fastapi import APIRouter
 from pydantic import BaseModel
 from models.server import Server
-from tt_util.aes_util import encrypt_aes, decrypt_aes
-from tt_util.yaml_util import read_yaml
 from .base import resp_200, resp_400
-from typing import List, Optional
+from typing import List
 
 server = APIRouter()
 
@@ -15,8 +13,6 @@ class ServerModelList(BaseModel):
     id: int
     webroot: str
     hostname: str
-    ip: str
-    password: str
 
     class Config:
         from_orm = True
@@ -31,12 +27,7 @@ async def get_server():
         # 处理异常，可以打印或记录错误信息
         logging.error(f"Error fetching server: {e}")
         return resp_400(message='查询错误')
-    data_list = []
-    for server in servers:
-        server_dict = ServerModelList.from_orm(server).dict()
-        # 在这里修改字段
-        server_dict['password'] = decrypt_aes(server_dict["password"], str(read_yaml('aes_key', 'config')))
-        data_list.append(server_dict)
+    data_list = [ServerModelList.from_orm(server).dict() for server in servers]
     response_data = {
         'items': data_list,
         'total': len(data_list)
@@ -47,8 +38,6 @@ async def get_server():
 class AddServerModel(BaseModel):
     webroot: str
     hostname: str
-    ip: str
-    password: str
 
 
 @server.put('/add', summary='添加服务器')
@@ -56,10 +45,7 @@ async def add_server(item: AddServerModel):
     data = {
         "webroot": item.webroot,
         "hostname": item.hostname,
-        "ip": item.ip,
-        "password": item.password,
     }
-    data["password"] = encrypt_aes(data["password"], str(read_yaml('aes_key', 'config')))
     try:
         add_data = await Server.create(**data)
     except Exception as e:
@@ -69,8 +55,6 @@ async def add_server(item: AddServerModel):
         'id': add_data.id,
         "webroot": add_data.webroot,
         'hostname': add_data.hostname,
-        'ip': add_data.ip,
-        'password': item.password,
     }
     return resp_200(data=resp_data, message='新增成功')
 
@@ -94,8 +78,6 @@ class EditServerModel(BaseModel):
     id: int
     webroot: str
     hostname: str
-    ip: str
-    password: str
 
 
 @server.post('/edit', summary='编辑服务器')
@@ -107,8 +89,6 @@ async def edit_server(item: EditServerModel):
         return resp_400(message='没有查到该条数据')
     old_data.hostname = item.hostname
     old_data.ip = item.ip
-    old_data.webroot = item.webroot
-    old_data.password = encrypt_aes(item.password, str(read_yaml('aes_key', 'config')))
     try:
         await old_data.save()
     except Exception as e:
@@ -119,7 +99,5 @@ async def edit_server(item: EditServerModel):
         'id': retrieved_data.id,
         "webroot": retrieved_data.webroot,
         'hostname': retrieved_data.hostname,
-        'ip': retrieved_data.ip,
-        'password': item.password,
     }
     return resp_200(data=resp_data, message='修改成功')

@@ -23,8 +23,7 @@ class SslFunction(object):
         self.server_host = None
         self.server_password = None
 
-    def ask_ssl(self, aliyun_access_key: str, aliyun_access_secret: str, domain: str, server_host: str,
-                server_password: str):
+    def ask_ssl(self, aliyun_access_key: str, aliyun_access_secret: str, domain: str):
         """
         获取ssl证书
         :param aliyun_access_key:       阿里云access_key
@@ -50,9 +49,6 @@ class SslFunction(object):
             f.write('--preferred-challenges dns \\\n')
             f.write("--manual-cleanup-hook 'aliyun-dns clean'")
         # 复制配置文件到运行目录
-        # exec_shell('mkdir /auto_ssl_push_svn')
-        # exec_shell('cp ' + os.getcwd() + '/temp/credentials.ini /auto_ssl_push_svn')
-        # exec_shell('cp ' + os.getcwd() + '/temp/setup.sh /auto_ssl_push_svn')
         ssh = SSHClient(host=read_yaml('server_host', 'config'), password=read_yaml('server_password', 'config'))
         ssh.execute_command('mkdir /auto_ssl_push_svn')
         ssh.upload_file(os.getcwd() + '/temp/credentials.ini', '/auto_ssl_push_svn/credentials.ini')
@@ -69,15 +65,13 @@ class SslFunction(object):
             if not check_file(f'/etc/letsencrypt/live/{domain[2:]}', 'cert*.pem'):
                 return resp_400(message='没有成功申请证书')
 
-    def upload_svn(self, hostname: str, repo_url: str, domain: str, server_host: str, server_password: str):
+    def upload_svn(self, hostname: str, repo_url: str, domain: str):
         """
         下载证书并上传到svn
         :param hostname:            hostname
         :param repo_url:            svn克隆地址
         :param domain:              域名
-        :param server_host:         申请证书服务器的ip
-        :param server_password:     申请证书服务器的密码
-        :return:
+
         """
         exec_shell('mkdir -p ' + os.getcwd() + '/temp/svn')
         # 上传至svn
@@ -106,4 +100,3 @@ class SslFunction(object):
         logging.info(f'提交返回码: {commit_code}')
 
         exec_shell('rm -rf ' + os.getcwd() + '/temp/svn')
-        logging.info('上传成功')

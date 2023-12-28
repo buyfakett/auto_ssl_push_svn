@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-            
 # @Author : buyfakett
 # @Time : 2023/11/20 17:12
+import ast
 import logging
 import os, subprocess
+import dns.resolver
 
 from fastapi import APIRouter
 
@@ -13,7 +15,28 @@ from tt_util.yaml_util import read_yaml
 from api.base import resp_200, resp_400
 from tt_util.ssh_util import SSHClient
 
+from tt_util.check_domain import check_domain
+
+from models.server import Server
+
 test1 = APIRouter()
+
+
+@test1.get('/1')
+async def database():
+    data = '[10]'
+    q = ast.literal_eval(data)
+    servers = await Server.filter(id__in=q)
+    for server in servers:
+        print(server.ip)
+
+
+@test1.get('/domain')
+async def test_domain(domain):
+    if not check_domain(domain):
+        return resp_400()
+    else:
+        return resp_200()
 
 
 @test1.get('/upload1')

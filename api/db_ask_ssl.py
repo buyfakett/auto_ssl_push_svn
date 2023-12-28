@@ -27,14 +27,11 @@ async def db_ask_ssl():
                 ask_flag = True
         if ask_flag:
             first_domain_data = await first_domain.get(id=ssl_data.first_domain_id)
-            server_data = await Server.get(id=ssl_data.server_id)
             ask_ssl = SslFunction()
             # 获取ssl证书
             ask_ssl.ask_ssl(aliyun_access_key=first_domain_data.domain_account_key,
                             aliyun_access_secret=first_domain_data.domain_account_secret,
-                            domain=ssl_data.certificate_domain,
-                            server_host=server_data.ip,
-                            server_password=decrypt_aes(server_data.password, str(read_yaml('aes_key', 'config'))))
+                            domain=ssl_data.certificate_domain)
             list_server = ast.literal_eval(ssl_data.server_ids)
             servers = await Server.filter(id__in=list_server)
             for server in servers:
@@ -42,6 +39,4 @@ async def db_ask_ssl():
                 # 分发证书
                 ask_ssl.upload_svn(hostname=server.hostname,
                                    repo_url=server.webroot,
-                                   domain=ssl_data.certificate_domain,
-                                   server_host=server.ip,
-                                   server_password=decrypt_aes(server.password, str(read_yaml('aes_key', 'config'))))
+                                   domain=ssl_data.certificate_domain)
