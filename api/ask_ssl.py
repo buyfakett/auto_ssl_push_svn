@@ -64,6 +64,7 @@ class SslFunction(object):
         else:
             if not check_file(f'/etc/letsencrypt/live/{domain[2:]}', 'cert*.pem'):
                 return resp_400(message='没有成功申请证书')
+        return True
 
     def upload_svn(self, hostname: str, repo_url: str, domain: str):
         """
