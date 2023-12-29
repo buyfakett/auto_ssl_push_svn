@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from tt_util.check_domain import check_domain
 
@@ -8,7 +8,9 @@ from models.first_domain import first_domain
 from .base import resp_200, resp_400
 from typing import List, Optional
 
-domain = APIRouter()
+from .oauth2 import verify_token
+
+domain = APIRouter(dependencies=[Depends(verify_token)])
 
 
 class DomainModelList(BaseModel):

@@ -12,6 +12,7 @@ from api.domain import domain
 from api.event_startup import event_startup
 from api.server import server
 from api.ssl import ssl
+from api.user import user
 from settings import TORTOISE_ORM
 from api.test import test1
 
@@ -53,6 +54,7 @@ register_tortoise(
 )
 
 # app.include_router(test1, prefix='/api/test', tags=['测试接口'])
+app.include_router(user, prefix='/api/user', tags=['用户'])
 app.include_router(domain, prefix='/api/domain', tags=['域名'])
 app.include_router(server, prefix='/api/server', tags=['服务器'])
 app.include_router(ssl, prefix='/api/ssl', tags=['ssl证书'])
@@ -60,7 +62,7 @@ app.include_router(ssl, prefix='/api/ssl', tags=['ssl证书'])
 
 @app.on_event("startup")
 async def startup_event():
-    event_startup()
+    await event_startup()
 
 
 if __name__ == "__main__":

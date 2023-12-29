@@ -1,4 +1,5 @@
 dnspython==2.4.2
+PyJWT==1.7.1
 tt_util
 aerich==0.7.2
 aiosqlite==0.17.0

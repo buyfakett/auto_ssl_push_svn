@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from tt_util.check_domain import check_domain
 
@@ -12,8 +12,9 @@ from typing import List, Optional
 from datetime import datetime
 
 from .db_ask_ssl import db_ask_ssl
+from .oauth2 import verify_token
 
-ssl = APIRouter()
+ssl = APIRouter(dependencies=[Depends(verify_token)])
 
 
 class SslModelList(BaseModel):

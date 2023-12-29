@@ -1,12 +1,14 @@
 import logging
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from models.server import Server
 from .base import resp_200, resp_400
 from typing import List
 
-server = APIRouter()
+from .oauth2 import verify_token
+
+server = APIRouter(dependencies=[Depends(verify_token)])
 
 
 class ServerModelList(BaseModel):

@@ -4,9 +4,11 @@
 import ast
 import logging
 import os, subprocess
+from datetime import datetime, timedelta
+
 import dns.resolver
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from api.ask_ssl import SslFunction
 from tt_util.svn_util import SVNClient
@@ -17,9 +19,27 @@ from tt_util.ssh_util import SSHClient
 
 from tt_util.check_domain import check_domain
 
+from api.oauth2 import verify_token, create_token
 from models.server import Server
 
 test1 = APIRouter()
+
+
+@test1.get('/test111')
+def test111(token_data: str = Depends(verify_token)):
+    logging.info(f'调用成功,token={token_data}')
+    return resp_200(message=f'调用成功,token={token_data}')
+
+@test1.get('/test222')
+def test222():
+    token_data = create_token(1)
+    return resp_200(message=f'{token_data}')
+
+@test1.get('/2')
+async def t2():
+    date = datetime.today().date() + timedelta(days=90)
+    print(date)
+    return resp_200()
 
 
 @test1.get('/1')
