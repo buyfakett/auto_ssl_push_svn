@@ -24,6 +24,8 @@ async def db_ask_ssl():
             differ_day = (ssl_data.exp_time - today).days
             if differ_day < 5:
                 ask_flag = True
+        if ssl_data.status == 1:
+            ask_ssl = False
         if ask_flag:
             first_domain_data = await first_domain.get(id=ssl_data.first_domain_id)
             ask_ssl = SslFunction()
@@ -36,6 +38,7 @@ async def db_ask_ssl():
                 if old_data.register_time is None:
                     old_data.register_time = today
                 old_data.exp_time = today + timedelta(days=90)
+                old_data.status = 1
                 try:
                     await old_data.save()
                 except Exception as e:
