@@ -6,6 +6,7 @@ import logging
 from datetime import datetime, timedelta
 
 from api.ask_ssl import SslFunction
+from api.base import resp_400
 from models.first_domain import first_domain
 from models.server import Server
 from models.ssl import Ssl
@@ -33,6 +34,11 @@ async def db_ask_ssl():
                 old_data = await Ssl.get(id=ssl_data.id)
                 old_data.register_time = today
                 old_data.exp_time = today + timedelta(days=90)
+                try:
+                    await old_data.save()
+                except Exception as e:
+                    logging.error(f"Error fetching ssl: {e}")
+                    return resp_400(message='修改错误')
                 list_server = ast.literal_eval(ssl_data.server_ids)
                 servers = await Server.filter(id__in=list_server)
                 for server in servers:
