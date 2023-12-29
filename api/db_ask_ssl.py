@@ -31,8 +31,10 @@ async def db_ask_ssl():
             if ask_ssl.ask_ssl(aliyun_access_key=first_domain_data.domain_account_key,
                             aliyun_access_secret=first_domain_data.domain_account_secret,
                             domain=ssl_data.certificate_domain):
+                # 更新证书的到期时间
                 old_data = await Ssl.get(id=ssl_data.id)
-                old_data.register_time = today
+                if old_data.register_time is None:
+                    old_data.register_time = today
                 old_data.exp_time = today + timedelta(days=90)
                 try:
                     await old_data.save()
