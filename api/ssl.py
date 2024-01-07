@@ -56,12 +56,6 @@ class AddSslModel(BaseModel):
 
 @ssl.put('/add', summary='添加证书')
 async def add_ssl(item: AddSslModel):
-    data = {
-        "first_domain_id": item.first_domain_id,
-        "server_ids": item.server_ids,
-        "certificate_domain": item.certificate_domain,
-        "status": item.status,
-    }
     try:
         await first_domain.get(id=item.first_domain_id)
     except Exception as e:
@@ -75,7 +69,7 @@ async def add_ssl(item: AddSslModel):
     if not check_domain(item.certificate_domain):
         return resp_400(message='域名没有解析到服务器')
     try:
-        add_data = await Ssl.create(**data)
+        add_data = await Ssl.create(**item.dict())
     except Exception as e:
         logging.error(f"Error fetching ssl: {e}")
         return resp_400(message='插入错误')

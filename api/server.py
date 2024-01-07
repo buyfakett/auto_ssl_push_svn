@@ -44,12 +44,8 @@ class AddServerModel(BaseModel):
 
 @server.put('/add', summary='添加服务器')
 async def add_server(item: AddServerModel):
-    data = {
-        "webroot": item.webroot,
-        "hostname": item.hostname,
-    }
     try:
-        add_data = await Server.create(**data)
+        add_data = await Server.create(**item.dict())
     except Exception as e:
         logging.error(f"Error fetching server: {e}")
         return resp_400(message='插入错误')

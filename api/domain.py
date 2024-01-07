@@ -52,20 +52,13 @@ class AddDomainModel(BaseModel):
 
 @domain.put('/add', summary='添加域名')
 async def add_domain(item: AddDomainModel):
-    data = {
-        "domain": item.domain,
-        "domain_manufacturer": item.domain_manufacturer,
-        "domain_account_key": item.domain_account_key,
-        "domain_account_secret": item.domain_account_secret,
-        "is_delete": item.is_delete,
-    }
     if item.domain_manufacturer != 'ali':
         return resp_400(401, '暂时不支持该厂商域名')
     # 判断域名是否解析到服务器
     if not check_domain(item.domain):
         return resp_400(message='域名没有解析到服务器')
     try:
-        add_data = await first_domain.create(**data)
+        add_data = await first_domain.create(**item.dict())
     except Exception as e:
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='插入错误')
