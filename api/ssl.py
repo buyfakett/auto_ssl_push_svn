@@ -20,7 +20,7 @@ ssl = APIRouter(dependencies=[Depends(verify_token)])
 class SslModelList(BaseModel):
     id: int
     first_domain_id: int
-    server_ids: List[int]
+    server_ids: str
     certificate_domain: str
     register_time: Optional[datetime]
     exp_time: Optional[datetime]
@@ -31,6 +31,10 @@ class SslModelList(BaseModel):
         from_attributes = True
 
 
+def serialize_datetime(dt: Optional[datetime]) -> Optional[str]:
+    return dt.date().strftime('%Y-%m-%d') if dt else None
+
+
 @ssl.get('/list', response_model=List[SslModelList], summary='获取证书列表')
 async def get_ssl():
     try:
@@ -39,7 +43,14 @@ async def get_ssl():
         # 处理异常，可以打印或记录错误信息
         logging.error(f"Error fetching ssl: {e}")
         return resp_400(message='查询错误')
-    data_list = [SslModelList.from_orm(ssl).dict() for ssl in ssls]
+    # data_list = [SslModelList.from_orm(ssl).dict() for ssl in ssls]
+    data_list = []
+    for ssl in ssls:
+        ssl_dict = SslModelList.from_orm(ssl).dict()
+        # 序列化 datetime 字段
+        ssl_dict['register_time'] = serialize_datetime(ssl_dict['register_time'])
+        ssl_dict['exp_time'] = serialize_datetime(ssl_dict['exp_time'])
+        data_list.append(ssl_dict)
     response_data = {
         'items': data_list,
         'total': len(data_list)
