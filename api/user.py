@@ -21,8 +21,9 @@ class LoginModel(BaseModel):
 
 @user.post('/login', summary='登录')
 async def login(item: LoginModel):
-    user_data = await User.get()
-    if item.user != user_data.user:
+    try:
+        user_data = await User.get(user=item.user)
+    except:
         return resp_400(message='账号错误')
     if md5(item.password) != user_data.password:
         return resp_400(message='密码错误')
@@ -33,19 +34,16 @@ async def login(item: LoginModel):
 
 
 class ChangeUserModel(BaseModel):
-    old_user: str
-    old_password: str
     user: str
     password: str
 
 
 @user.post('/change', summary='修改账号')
-async def change_user(item: ChangeUserModel, token: str = Depends(verify_token)):
-    user_data = await User.get()
-    if item.old_user != user_data.user:
-        return resp_400(message='账号错误')
-    if md5(item.old_password) != user_data.password:
-        return resp_400(message='密码错误')
+async def change_user(item: ChangeUserModel, user_id: int = Depends(verify_token)):
+    try:
+        user_data = await User.get(id=user_id)
+    except:
+        return resp_400(message='没有该用户')
     user_data.user = item.user
     user_data.password = md5(item.password)
     try:
