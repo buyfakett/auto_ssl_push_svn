@@ -94,7 +94,7 @@ class EditDomainModel(BaseModel):
     domain_manufacturer: str
     domain_account_key: str
     domain_account_secret: str
-    is_delete: bool
+    is_delete: Optional[bool] = False
 
 
 @domain.post('/edit', summary='编辑域名')
