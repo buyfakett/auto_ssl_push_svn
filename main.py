@@ -6,7 +6,10 @@
 import logging
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from tortoise.contrib.fastapi import register_tortoise
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from api.domain import domain
 from api.event_startup import event_startup
@@ -58,6 +61,23 @@ app.include_router(user, prefix='/api/user', tags=['用户'])
 app.include_router(domain, prefix='/api/domain', tags=['域名'])
 app.include_router(server, prefix='/api/server', tags=['服务器'])
 app.include_router(ssl, prefix='/api/ssl', tags=['ssl证书'])
+app.mount("/static", StaticFiles(directory="web/static"), name="static")
+app.mount("/admin", StaticFiles(directory="web/admin"), name="admin")
+
+origins = ['*']
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# 首页跳转
+@app.get('/')
+async def main():
+    return RedirectResponse('/admin/index.html')
 
 
 @app.on_event("startup")
