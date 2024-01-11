@@ -24,6 +24,13 @@ class DomainModelList(BaseModel):
         from_orm = True
         from_attributes = True
 
+    @classmethod
+    def mask_sensitive_data(cls, value: str) -> str:
+        if len(value) >= 4:
+            return value[:2] + '*' * (len(value) - 4) + value[-2:]
+        else:
+            return '*' * len(value)
+
 
 @domain.get('/list', response_model=List[DomainModelList], summary='获取域名列表')
 async def get_domain():
@@ -33,8 +40,13 @@ async def get_domain():
         # 处理异常，可以打印或记录错误信息
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='查询错误')
-    # 将数据库模型转换为响应模型
-    data_list = [DomainModelList.from_orm(domain).dict() for domain in domains]
+    data_list = []
+    for domain in domains:
+        domain_dict = DomainModelList.from_orm(domain).dict()
+        # 序列化 datetime 字段
+        domain_dict['domain_account_key'] = DomainModelList.mask_sensitive_data(domain_dict['domain_account_key'])
+        domain_dict['domain_account_secret'] = DomainModelList.mask_sensitive_data(domain_dict['domain_account_secret'])
+        data_list.append(domain_dict)
     response_data = {
         'items': data_list,
         'total': len(data_list)

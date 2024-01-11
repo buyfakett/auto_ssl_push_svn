@@ -43,7 +43,6 @@ async def get_ssl():
         # 处理异常，可以打印或记录错误信息
         logging.error(f"Error fetching ssl: {e}")
         return resp_400(message='查询错误')
-    # data_list = [SslModelList.from_orm(ssl).dict() for ssl in ssls]
     data_list = []
     for ssl in ssls:
         ssl_dict = SslModelList.from_orm(ssl).dict()
