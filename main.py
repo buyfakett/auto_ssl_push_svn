@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 # @Author : buyfakett
 # @Time : 2023/11/9 15:36
-
-
+import asyncio
 import logging
+
+import schedule
 import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -17,7 +18,7 @@ from api.server import server
 from api.ssl import ssl
 from api.user import user
 from settings import TORTOISE_ORM
-from api.test import test1
+# from api.test import test1
 
 # 日志记录器
 logger = logging.getLogger()
@@ -80,10 +81,17 @@ async def main():
     return RedirectResponse('/admin/index.html')
 
 
+async def run_schedule():
+    while True:
+        schedule.run_pending()
+        await asyncio.sleep(1)
+
+
 @app.on_event("startup")
 async def startup_event():
     await event_startup()
     start_daily_task()
+    await asyncio.create_task(run_schedule())
 
 
 if __name__ == "__main__":
