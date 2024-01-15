@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
 from api.domain import domain
-from api.event_startup import event_startup
+from api.event_startup import event_startup, start_daily_task
 from api.server import server
 from api.ssl import ssl
 from api.user import user
@@ -83,6 +83,7 @@ async def main():
 @app.on_event("startup")
 async def startup_event():
     await event_startup()
+    start_daily_task()
 
 
 if __name__ == "__main__":
