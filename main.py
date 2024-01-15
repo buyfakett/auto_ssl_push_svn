@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
 # @Author : buyfakett
 # @Time : 2023/11/9 15:36
-import asyncio
 import logging
 
-import schedule
 import uvicorn
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
+from api.db_ask_ssl import db_ask_ssl
 from api.domain import domain
-from api.event_startup import event_startup, start_daily_task
+from api.event_startup import event_startup
 from api.server import server
 from api.ssl import ssl
 from api.user import user
 from settings import TORTOISE_ORM
+
 # from api.test import test1
 
 # 日志记录器
@@ -81,17 +82,24 @@ async def main():
     return RedirectResponse('/admin/index.html')
 
 
-async def run_schedule():
-    while True:
-        schedule.run_pending()
-        await asyncio.sleep(1)
+scheduler = AsyncIOScheduler()
+
+
+# 添加任务到定时调度器
+@scheduler.scheduled_job('cron', hour=11, minute=0)
+def cron_job():
+    db_ask_ssl()
 
 
 @app.on_event("startup")
 async def startup_event():
     await event_startup()
-    start_daily_task()
-    await asyncio.create_task(run_schedule())
+    scheduler.start()
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    scheduler.shutdown()
 
 
 if __name__ == "__main__":

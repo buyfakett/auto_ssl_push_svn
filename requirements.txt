@@ -1,4 +1,4 @@
-schedule==1.2.1
+apscheduler==3.10.4
 dnspython==2.4.2
 PyJWT==1.7.1
 tt_util
