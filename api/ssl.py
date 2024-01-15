@@ -159,3 +159,9 @@ async def edit_ssl(item: EditSslModel):
 async def refresh_ssl():
     await db_ask_ssl()
     return resp_200(message='调用成功')
+
+
+@ssl.post('/refresh/{ssl_id}', summary='刷新单个证书')
+async def refresh_ssl(ssl_id: int):
+    await db_ask_ssl(ssl_id)
+    return resp_200(message='调用成功')
