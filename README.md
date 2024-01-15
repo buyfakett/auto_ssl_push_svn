@@ -1,6 +1,6 @@
 # auto_ssl_push_svn
 
-这是一个自动获取/续期ssl证书的服务
+这是一个自动获取/续期ssl证书的服务，并推送到svn
 
 - 需要先添加主域名(目前只支持阿里)
 - 然后再添加服务器(svn地址)
@@ -8,9 +8,9 @@
 
 ### 技术
 
-fastapi
+- fastapi
 
-tortoise-orm
+- tortoise-orm
 
 ### 使用教程
 
