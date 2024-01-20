@@ -87,8 +87,8 @@ scheduler = AsyncIOScheduler()
 
 # 添加任务到定时调度器
 @scheduler.scheduled_job('cron', hour=11, minute=0)
-def cron_job():
-    db_ask_ssl()
+async def cron_job():
+    await db_ask_ssl()
 
 
 @app.on_event("startup")
