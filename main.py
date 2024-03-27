@@ -2,11 +2,13 @@
 # @Author : buyfakett
 # @Time : 2023/11/9 15:36
 import logging
+import os
 
 import uvicorn
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
+from pyresp.pyresp import resp_200
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
@@ -37,12 +39,24 @@ to_console = logging.StreamHandler()
 to_console.setFormatter(formatter)
 logger.addHandler(to_console)
 
+# 初始化文件夹
+for init_dir in ['web/static', 'web/admin']:
+    if not os.path.exists(init_dir):
+        os.makedirs(init_dir)
+
+with open(os.getcwd() + '/version.py', encoding="utf-8") as f:
+    version_var = {}
+    exec(f.read(), version_var)
+    VERSION = version_var['VERSION']
+
+logging.info(f'当前服务端版本为：v{VERSION}')
+
 app = FastAPI(
     openapi_url="/api/openapi.json",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     title="auto_ssl_push_svn",
-    version="0.1.0",
+    version=VERSION,
     description="自动获取ssl证书，并推送到svn",
     contact={
         "name": "buyfakett",
@@ -80,6 +94,23 @@ app.add_middleware(
 @app.get('/')
 async def main():
     return RedirectResponse('/admin/index.html')
+
+
+@app.get('/api/getServerVersion')
+async def get_server_version():
+    return resp_200(data={'version': VERSION})
+
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    uri = request.url.path
+    if 'api' in uri:
+        method = request.method
+        url = request.base_url
+        logging.info(
+            f'\n请求方式：{method}\n请求地址：{url}\n请求接口：{uri}\n请求头：{request.headers}\n请求入参：{await request.json() if request.method == "POST" else None}\n请求参数：{request.query_params}')
+    response = await call_next(request)
+    return response
 
 
 scheduler = AsyncIOScheduler()

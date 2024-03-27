@@ -6,8 +6,8 @@ import logging
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from api.base import resp_200, resp_400
-from api.oauth2 import create_token, verify_token
+from pyresp.pyresp import resp_200, resp_400
+from pyoauth2_util.oauth2 import create_token, verify_token
 from models.user import User
 from tt_util.aes_util import md5
 

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from api.ask_ssl import SslFunction
-from api.base import resp_400
+from pyresp.pyresp import resp_400
 from models.first_domain import first_domain
 from models.server import Server
 from models.ssl import Ssl

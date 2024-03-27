@@ -14,12 +14,12 @@ from api.ask_ssl import SslFunction
 from tt_util.svn_util import SVNClient
 from tt_util.exec_shell import exec_shell
 from tt_util.yaml_util import read_yaml
-from api.base import resp_200, resp_400
+from pyresp.pyresp import resp_200, resp_400
 from tt_util.ssh_util import SSHClient
 
 from tt_util.check_domain import check_domain
 
-from api.oauth2 import verify_token, create_token
+from pyoauth2_util.oauth2 import verify_token, create_token
 from models.server import Server
 
 test1 = APIRouter()

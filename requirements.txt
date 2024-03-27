@@ -38,5 +38,7 @@ tortoise-orm==0.20.0
 typing_extensions==4.8.0
 urllib3==2.0.7
 uvicorn==0.24.0.post1
-
+pyoauth2_util==1.0.6
+pyresp==1.0.2
+pyaes_util
 paramiko~=3.3.1

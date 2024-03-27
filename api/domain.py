@@ -5,10 +5,10 @@ from pydantic import BaseModel
 from tt_util.check_domain import check_domain
 
 from models.first_domain import first_domain
-from .base import resp_200, resp_400
+from pyresp.pyresp import resp_200, resp_400
 from typing import List, Optional
 
-from .oauth2 import verify_token
+from pyoauth2_util.oauth2 import verify_token
 
 domain = APIRouter(dependencies=[Depends(verify_token)])
 
@@ -66,9 +66,6 @@ class AddDomainModel(BaseModel):
 async def add_domain(item: AddDomainModel):
     if item.domain_manufacturer != 'ali':
         return resp_400(401, '暂时不支持该厂商域名')
-    # 判断域名是否解析到服务器
-    if not check_domain(item.domain):
-        return resp_400(message='域名没有解析到服务器')
     try:
         add_data = await first_domain.create(**item.dict())
     except Exception as e:

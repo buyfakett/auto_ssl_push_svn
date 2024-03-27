@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-            
 # @Author : buyfakett
 # @Time : 2023/11/13 15:35
-from tt_util.yaml_util import read_yaml
+from pyconfig_util.config_util import Setting
+setting = Setting()
 
 TORTOISE_ORM = {
     'connections': {
         'default': {
             'engine': 'tortoise.backends.asyncpg',
             'credentials': {
-                'host': str(read_yaml('host', 'db')),
-                'port': str(read_yaml('port', 'db')),
-                'user': str(read_yaml('user', 'db')),
-                'password': str(read_yaml('password', 'db')),
-                'database': str(read_yaml('database', 'db')),
+                'host': str(setting.DATABASE_HOST),
+                'port': str(setting.DATABASE_PORT),
+                'user': str(setting.DATABASE_USER),
+                'password': str(setting.DATABASE_PASSWORD),
+                'database': str(setting.DATABASE_DATABASE),
             }
         }
     },
