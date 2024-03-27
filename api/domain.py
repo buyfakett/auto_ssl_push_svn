@@ -2,7 +2,6 @@ import logging
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from tt_util.check_domain import check_domain
 
 from models.first_domain import first_domain
 from pyresp.pyresp import resp_200, resp_400
@@ -115,9 +114,6 @@ async def edit_domain(item: EditDomainModel):
     except Exception as e:
         logging.error(f"Error fetching domains: {e}")
         return resp_400(message='没有查到该条数据')
-    # 判断域名是否解析到服务器
-    if not check_domain(item.domain):
-        return resp_400(message='域名没有解析到服务器')
     old_data.domain = item.domain
     old_data.domain_manufacturer = item.domain_manufacturer
     old_data.domain_account_key = item.domain_account_key

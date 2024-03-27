@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from pyresp.pyresp import resp_200, resp_400
 from pyoauth2_util.oauth2 import create_token, verify_token
 from models.user import User
-from tt_util.aes_util import md5
+from pyaes_util.aes_util import md5
 
 user = APIRouter()
 

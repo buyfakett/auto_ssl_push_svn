@@ -5,9 +5,9 @@ import logging
 import os
 
 from pyresp.pyresp import resp_400
-from tt_util.exec_shell import exec_shell, check_file
-from tt_util.ssh_util import SSHClient
-from tt_util.svn_util import SVNClient
+from pyexec_shell.exec_shell import exec_shell, check_file
+from pyssh_util.ssh_util import SSHClient
+from pysvn_util.svn_util import SVNClient
 from pyconfig_util.config_util import Setting
 setting = Setting()
 

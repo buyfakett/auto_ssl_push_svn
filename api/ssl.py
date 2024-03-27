@@ -2,7 +2,6 @@ import logging
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from tt_util.check_domain import check_domain
 
 from models.ssl import Ssl
 from models.first_domain import first_domain
@@ -75,9 +74,6 @@ async def add_ssl(item: AddSslModel):
     if len(existing_ids) != len(item.server_ids):
         # 如果查询出来的 ID 数量和待查询的 ID 数量相等，说明所有 ID 都存在
         return resp_400(message='服务器的数组错误')
-    # 判断域名是否解析到服务器
-    if not check_domain(item.certificate_domain):
-        return resp_400(message='域名没有解析到服务器')
     try:
         add_data = await Ssl.create(**item.dict())
     except Exception as e:
@@ -132,9 +128,6 @@ async def edit_ssl(item: EditSslModel):
     if len(existing_ids) != len(item.server_ids):
         # 如果查询出来的 ID 数量和待查询的 ID 数量相等，说明所有 ID 都存在
         return resp_400(message='服务器的数组错误')
-    # 判断域名是否解析到服务器
-    if not check_domain(item.certificate_domain):
-        return resp_400(message='域名没有解析到服务器')
     old_data.first_domain_id = item.first_domain_id
     old_data.certificate_domain = item.certificate_domain
     old_data.server_ids = item.server_ids
