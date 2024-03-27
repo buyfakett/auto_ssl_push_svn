@@ -5,7 +5,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
     && apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev openssl-dev bash\
     && apk add --no-cache libffi openssl subversion \
     && pip3 install --no-cache-dir --upgrade pip setuptools wheel gunicorn -i https://pypi.tuna.tsinghua.edu.cn/simple\
-    && pip3 instal --no-cache-dirl -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple\
+    && pip3 install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple\
     && apk del .build-deps
 ADD . /app
 RUN rm -f /etc/localtime
