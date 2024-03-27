@@ -8,13 +8,14 @@ from pyresp.pyresp import resp_400
 from tt_util.exec_shell import exec_shell, check_file
 from tt_util.ssh_util import SSHClient
 from tt_util.svn_util import SVNClient
-from tt_util.yaml_util import read_yaml
+from pyconfig_util.config_util import Setting
+setting = Setting()
 
 
 class SslFunction(object):
-    def __init__(self, svn_user=read_yaml('svn_user', 'config'),
-                 svn_passwd=read_yaml('svn_passwd', 'config'),
-                 mail=read_yaml('mail', 'config')):
+    def __init__(self, svn_user=str(setting.SVN_USER),
+                 svn_passwd=str(setting.SVN_PASSWD),
+                 mail=str(setting.SVN_MAIL)):
         self.svn_user = svn_user
         self.svn_passwd = svn_passwd
         self.mail = mail
@@ -49,7 +50,7 @@ class SslFunction(object):
             f.write('--preferred-challenges dns \\\n')
             f.write("--manual-cleanup-hook 'aliyun-dns clean'")
         # 复制配置文件到运行目录
-        ssh = SSHClient(host=read_yaml('server_host', 'config'), password=read_yaml('server_password', 'config'))
+        ssh = SSHClient(host=str(setting.SVN_HOST), password=str(setting.SVN_PASSWORD))
         ssh.execute_command('mkdir /auto_ssl_push_svn')
         ssh.upload_file(os.getcwd() + '/temp/credentials.ini', '/auto_ssl_push_svn/credentials.ini')
         ssh.upload_and_execute_script(os.getcwd() + '/temp/setup.sh', '/auto_ssl_push_svn/setup.sh')
