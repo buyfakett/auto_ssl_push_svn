@@ -8,8 +8,7 @@ from pyresp.pyresp import resp_400
 from pyexec_shell.exec_shell import exec_shell, check_file
 from pyssh_util.ssh_util import SSHClient
 from pysvn_util.svn_util import SVNClient
-from pyconfig_util.config_util import Setting
-setting = Setting()
+from settings import setting
 
 
 class SslFunction(object):
