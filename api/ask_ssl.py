@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-            
 # @Author : buyfakett
 # @Time : 2023/11/22 9:46
+import json
 import logging
 import os
 
+import requests
 from pyresp.pyresp import resp_400
 from pyexec_shell.exec_shell import exec_shell, check_file
 from pyssh_util.ssh_util import SSHClient
@@ -97,5 +99,20 @@ class SslFunction(object):
         logging.info(f'提交日志: {commit_output}')
         logging.error(f'提交错误: {commit_error}')
         logging.info(f'提交返回码: {commit_code}')
+
+        message = f' {domain} 证书更新成功，已推送至 {repo_url} ！！！'
+        if setting.PUSH_TYPE == 'ding':
+            push_data = {
+                'msgtype': 'text',
+                'text': {
+                    'content': message
+                }
+            }
+            push_url = "https://oapi.dingtalk.com/robot/send?access_token=" + setting.PUSH_DING_ACCESS_TOKEN
+            response = requests.post(push_url, json=push_data)
+            if json.loads(response.text)['errcode'] == 0:
+                logging.info("推送钉钉：" + json.loads(response.text)['errmsg'])
+            else:
+                logging.error('推送错误')
 
         exec_shell('rm -rf ' + os.getcwd() + '/temp/svn')
