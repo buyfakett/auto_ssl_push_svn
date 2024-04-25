@@ -16,7 +16,7 @@ class SslFunction(object):
                  svn_passwd=str(setting.SVN_PASSWD),
                  mail=str(setting.SVN_MAIL),
                  server_host=str(setting.SERVER_HOST),
-                 server_passwd=str(setting.SERVER_PASSWD)):
+                 server_passwd=str(setting.SERVER_PASSWORD)):
         self.svn_user = svn_user
         self.svn_passwd = svn_passwd
         self.mail = mail
