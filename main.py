@@ -102,18 +102,18 @@ app.add_middleware(
 
 # 首页跳转
 @app.get('/')
-async def main():
+async def index():
     return RedirectResponse('/admin/index.html')
 
 
 @app.get('/favicon.ico')
-async def main():
+async def ico():
     return RedirectResponse('/admin/favicon.ico')
 
 
 @app.get('/api/getServerVersion')
 async def get_server_version():
-    return resp_200(data={'version': VERSION})
+    return resp_200(data={'version': VERSION}, message='获取版本号成功')
 
 
 @app.middleware("http")
