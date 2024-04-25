@@ -23,18 +23,12 @@ class SslFunction(object):
         self.server_host = server_host
         self.server_passwd = server_passwd
 
-        # 初始化申请证书服务器的信息，在ask_ssk方法入参里赋值，可以让别的方法调
-        self.server_host = None
-        self.server_password = None
-
     def ask_ssl(self, aliyun_access_key: str, aliyun_access_secret: str, domain: str):
         """
         获取ssl证书
         :param aliyun_access_key:       阿里云access_key
         :param aliyun_access_secret:    阿里云access_secret
         :param domain:                  域名
-        :param server_host:             申请证书服务器的ip
-        :param server_password:         申请证书服务器的密码
         """
         with open('./temp/' + 'credentials.ini', encoding="utf-8", mode="a") as f:
             f.write(f'dns_aliyun_access_key = {aliyun_access_key}\n')
