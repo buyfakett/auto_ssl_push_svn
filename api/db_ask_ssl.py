@@ -11,6 +11,7 @@ from pyresp.pyresp import resp_400
 from models.first_domain import first_domain
 from models.server import Server
 from models.ssl import Ssl
+from settings import setting
 
 
 async def db_ask_ssl(ssl_id: Optional[int] = None):
@@ -19,15 +20,18 @@ async def db_ask_ssl(ssl_id: Optional[int] = None):
         # 查询所有证书
         ssl_datas = await Ssl.all()
         for ssl_data in ssl_datas:
-            # 如果证书到期时间为空或者5天内过期，就续费
+            # 如果证书到期时间为空或者配置的天内过期，就续费
             ask_flag = False
             if ssl_data.exp_time is None:
+                logging.info(f"证书到期时间为空，开始续费")
                 ask_flag = True
             else:
                 differ_day = (ssl_data.exp_time - today).days
-                if differ_day < 5:
+                if differ_day <= int(setting.CONFIG_DIFFER_DAY):
+                    logging.info(f"证书到期时间小于{setting.CONFIG_DIFFER_DAY}，开始续费")
                     ask_flag = True
-            if ssl_data.status == 1:
+            # 判断是否不进行续费
+            if ssl_data.status == 0:
                 ask_ssl = False
             if ask_flag:
                 first_domain_data = await first_domain.get(id=ssl_data.first_domain_id)
@@ -57,15 +61,18 @@ async def db_ask_ssl(ssl_id: Optional[int] = None):
                                            domain=ssl_data.certificate_domain)
     else:
         ssl_data = await Ssl.get(id=ssl_id)
-        # 如果证书到期时间为空或者5天内过期，就续费
+        # 如果证书到期时间为空或者配置的天内过期，就续费
         ask_flag = False
         if ssl_data.exp_time is None:
+            logging.info(f"证书到期时间为空，开始续费")
             ask_flag = True
         else:
             differ_day = (ssl_data.exp_time - today).days
-            if differ_day < 5:
+            if differ_day <= int(setting.CONFIG_DIFFER_DAY):
+                logging.info(f"证书到期时间小于{setting.CONFIG_DIFFER_DAY}，开始续费")
                 ask_flag = True
-        if ssl_data.status == 1:
+        # 判断是否不进行续费
+        if ssl_data.status == 0:
             ask_ssl = False
         if ask_flag:
             first_domain_data = await first_domain.get(id=ssl_data.first_domain_id)
