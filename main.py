@@ -112,21 +112,29 @@ async def get_server_version():
 
 
 @app.middleware("http")
-def add_process_time_header(request: Request, call_next):
+async def add_process_time_header(request: Request, call_next):
     uri = request.url.path
     if 'api' in uri:
         method = request.method
         url = request.base_url
+        # 如果请求方法是 POST，则获取请求的 JSON 数据
+        if request.method == "POST":
+            body = await request.body()
+            # 将请求体解码为字符串
+            body_str = body.decode("utf-8")
+        # 否则，设置为 None
+        else:
+            body_str = None
         logging.info(
             f'\n'
             f'\033[0;31m请求方式：\033[0;32m{method}\033[0m\n'
             f'\033[0;31m请求地址：\033[0;32m{url}\033[0m\n'
             f'\033[0;31m请求接口：\033[0;32m{uri}\033[0m\n'
             f'\033[0;31m请求头：\033[0;32m{request.headers}\033[0m\n'
-            f'\033[0;31m请求入参：\033[0;32m{request.json() if request.method == "POST" else None}\033[0m\n'
+            f'\033[0;31m请求入参：\033[0;32m{body_str}\033[0m\n'
             f'\033[0;31m请求参数：\033[0;32m{request.query_params}\033[0m'
         )
-    response = call_next(request)
+    response = await call_next(request)
     return response
 
 
