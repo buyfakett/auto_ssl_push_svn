@@ -20,11 +20,11 @@ h11==0.14.0
 idna==3.4
 iso8601==1.1.0
 Naked==0.1.32
-pycryptodome==3.19.0
+pycryptodome==3.20.0
 pydantic==2.4.2
 pydantic_core==2.10.1
 pypika-tortoise==0.1.6
-python-multipart==0.0.6
+python-multipart==0.0.9
 pytz==2023.3.post1
 PyYAML==6.0.1
 requests==2.31.0
@@ -38,9 +38,10 @@ typing_extensions==4.8.0
 urllib3==2.0.7
 uvicorn==0.24.0.post1
 pyoauth2_util==1.0.6
-pyresp==1.0.2
+pyresp==1.0.3
 pyaes_util
 pysvn_util==1.0.2
 pyssh_util==1.0.0
 pyexec_shell==1.0.1
-paramiko~=3.3.1
+paramiko==3.4.0
+colorlog

@@ -12,6 +12,7 @@ from pyresp.pyresp import resp_200
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
+from colorlog import ColoredFormatter
 
 from api.db_ask_ssl import db_ask_ssl
 from api.domain import domain
@@ -28,8 +29,20 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # 设置日志格式
-formatter = logging.Formatter(
-    "[%(levelname)s][%(asctime)s][%(filename)s:%(lineno)d]    %(message)s"
+formatter = ColoredFormatter(
+    "%(log_color)s%(levelname)s%(reset)s %(white)s[%(asctime)s]%(reset)s "
+    "%(blue)s[%(filename)s:%(lineno)d]%(reset)s %(message)s",
+    datefmt=None,
+    reset=True,
+    log_colors={
+        'DEBUG':    'cyan',
+        'INFO':     'green',
+        'WARNING':  'yellow',
+        'ERROR':    'red',
+        'CRITICAL': 'red,bg_white',
+    },
+    secondary_log_colors={},
+    style='%'
 )
 
 # 输出到控制台
@@ -105,7 +118,14 @@ def add_process_time_header(request: Request, call_next):
         method = request.method
         url = request.base_url
         logging.info(
-            f'\n请求方式：{method}\n请求地址：{url}\n请求接口：{uri}\n请求头：{request.headers}\n请求入参：{request.json() if method == "POST" else None}\n请求参数：{request.query_params}')
+            f'\n'
+            f'\033[0;31m请求方式：\033[0;32m{method}\033[0m\n'
+            f'\033[0;31m请求地址：\033[0;32m{url}\033[0m\n'
+            f'\033[0;31m请求接口：\033[0;32m{uri}\033[0m\n'
+            f'\033[0;31m请求头：\033[0;32m{request.headers}\033[0m\n'
+            f'\033[0;31m请求入参：\033[0;32m{request.json() if request.method == "POST" else None}\033[0m\n'
+            f'\033[0;31m请求参数：\033[0;32m{request.query_params}\033[0m'
+        )
     response = call_next(request)
     return response
 
