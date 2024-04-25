@@ -14,10 +14,14 @@ from settings import setting
 class SslFunction(object):
     def __init__(self, svn_user=str(setting.SVN_USER),
                  svn_passwd=str(setting.SVN_PASSWD),
-                 mail=str(setting.SVN_MAIL)):
+                 mail=str(setting.SVN_MAIL),
+                 server_host=str(setting.SERVER_HOST),
+                 server_passwd=str(setting.SERVER_PASSWD)):
         self.svn_user = svn_user
         self.svn_passwd = svn_passwd
         self.mail = mail
+        self.server_host = server_host
+        self.server_passwd = server_passwd
 
         # 初始化申请证书服务器的信息，在ask_ssk方法入参里赋值，可以让别的方法调
         self.server_host = None
@@ -49,7 +53,7 @@ class SslFunction(object):
             f.write('--preferred-challenges dns \\\n')
             f.write("--manual-cleanup-hook 'aliyun-dns clean'")
         # 复制配置文件到运行目录
-        ssh = SSHClient(host=str(setting.SVN_HOST), password=str(setting.SVN_PASSWORD))
+        ssh = SSHClient(host=self.server_host, password=self.server_passwd)
         ssh.execute_command('mkdir /auto_ssl_push_svn')
         ssh.upload_file(os.getcwd() + '/temp/credentials.ini', '/auto_ssl_push_svn/credentials.ini')
         ssh.upload_and_execute_script(os.getcwd() + '/temp/setup.sh', '/auto_ssl_push_svn/setup.sh')
