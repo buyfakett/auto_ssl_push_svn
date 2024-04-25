@@ -10,7 +10,7 @@ from pyresp.pyresp import resp_200, resp_400
 from typing import List, Optional
 from datetime import datetime
 
-from .db_ask_ssl import db_ask_ssl
+from util.db_ask_ssl import db_ask_ssl
 from pyoauth2_util.oauth2 import verify_token
 
 ssl = APIRouter(dependencies=[Depends(verify_token)])

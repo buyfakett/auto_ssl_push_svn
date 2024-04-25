@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from colorlog import ColoredFormatter
 
-from api.db_ask_ssl import db_ask_ssl
+from util.db_ask_ssl import db_ask_ssl
 from api.domain import domain
 from api.event_startup import event_startup
 from api.server import server

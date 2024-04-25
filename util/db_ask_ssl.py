@@ -6,7 +6,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import Optional
 
-from api.ask_ssl import SslFunction
+from util.ask_ssl import SslFunction
 from pyresp.pyresp import resp_400
 from models.first_domain import first_domain
 from models.server import Server
