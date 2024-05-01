@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-            
 # @Author : buyfakett
 # @Time : 2023/11/13 15:35
-from pyconfig_util.config_util import Setting
-setting = Setting()
+from pyconfig_util.config_util import setting
 
 TORTOISE_ORM = {
     'connections': {
