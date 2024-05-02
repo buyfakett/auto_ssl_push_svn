@@ -6,11 +6,13 @@ import logging
 import os
 
 import requests
-from pyresp.pyresp import resp_400
 from pyexec_shell.exec_shell import exec_shell, check_file
 from pyssh_util.ssh_util import SSHClient
 from pysvn_util.svn_util import SVNClient
+
+from models.ssl import Ssl
 from settings import setting
+from pycheck_domain.check_domain import check_ssl
 
 
 class SslFunction(object):
@@ -25,7 +27,7 @@ class SslFunction(object):
         self.server_host = server_host
         self.server_passwd = server_passwd
 
-    def ask_ssl(self, aliyun_access_key: str, aliyun_access_secret: str, domain: str):
+    def ask_ssl(self, aliyun_access_key: str, aliyun_access_secret: str, domain: str, ssl_id: int):
         """
         获取ssl证书
         :param aliyun_access_key:       阿里云access_key
@@ -59,11 +61,31 @@ class SslFunction(object):
         exec_shell('/bin/bash /auto_ssl_push_svn/setup.sh')
         # 判断是否是泛域名，如果是泛域名生成的文件夹是不带*的
         if not domain.startswith('*'):
-            if not check_file(f'/etc/letsencrypt/live/{domain}', 'cert*.pem'):
-                return resp_400(message='没有成功申请证书')
+            ssl_path = f'/etc/letsencrypt/live/{domain}'
         else:
-            if not check_file(f'/etc/letsencrypt/live/{domain[2:]}', 'cert*.pem'):
-                return resp_400(message='没有成功申请证书')
+            ssl_path = f'/etc/letsencrypt/live/{domain[2:]}'
+        if not check_file(ssl_path, 'cert*.pem'):
+            logging.error(f'没有成功申请证书 {domain}，原因未知')
+            return False
+        try:
+            ssl_data = Ssl.get(id=ssl_id)
+        except Exception as e:
+            # 处理异常，可以打印或记录错误信息
+            logging.error(f"Error fetching server: {e}")
+            return False
+        start_time, end_time = check_ssl(f'/etc/letsencrypt/live/{domain}')
+        if end_time - ssl_data.exp_time <= int(setting.CONFIG_DIFFER_DAY):
+            logging.error(f'没有成功申请证书 {domain}，证书到期时间比设定时间更短')
+            return False
+        # 更新证书的到期时间
+        ssl_data.status = 1
+        ssl_data.register_time = start_time
+        ssl_data.exp_time = end_time
+        try:
+            ssl_data.save()
+        except Exception as e:
+            logging.error(f"Error fetching ssl: {e}")
+            return False
         return True
 
     def upload_svn(self, hostname: str, repo_url: str, domain: str):
