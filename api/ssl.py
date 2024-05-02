@@ -1,7 +1,7 @@
 import logging
 
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from models.ssl import Ssl
 from models.first_domain import first_domain
@@ -23,6 +23,7 @@ class SslModelList(BaseModel):
     certificate_domain: str
     register_time: Optional[datetime]
     exp_time: Optional[datetime]
+    percentage: Optional[int] = Field(0, alias="percentage")
     status: int
 
     class Config:
@@ -48,6 +49,17 @@ async def get_ssl():
         # 序列化 datetime 字段
         ssl_dict['register_time'] = serialize_datetime(ssl_dict['register_time'])
         ssl_dict['exp_time'] = serialize_datetime(ssl_dict['exp_time'])
+        if ssl_dict['register_time'] and ssl_dict['exp_time']:
+            # 解析日期
+            start_datetime = datetime.strptime(ssl_dict['register_time'], "%Y-%m-%d")
+            end_datetime = datetime.strptime(ssl_dict['exp_time'], "%Y-%m-%d")
+            # 计算日期差
+            delta_days = (end_datetime - start_datetime).days
+            # 计算百分比
+            percentage = int(delta_days / 365 * 100)
+            ssl_dict['percentage'] = percentage
+        else:
+            ssl_dict['percentage'] = None
         data_list.append(ssl_dict)
     response_data = {
         'items': data_list,
