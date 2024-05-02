@@ -45,3 +45,4 @@ pyssh_util==1.0.0
 pyexec_shell==1.0.1
 paramiko==3.4.0
 colorlog
+pycheck_domain==1.0.1
