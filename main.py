@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from colorlog import ColoredFormatter
 
-from api.db_ask_ssl import db_ask_ssl
+from util.db_ask_ssl import db_ask_ssl
 from api.domain import domain
 from api.event_startup import event_startup
 from api.server import server
@@ -35,10 +35,10 @@ formatter = ColoredFormatter(
     datefmt=None,
     reset=True,
     log_colors={
-        'DEBUG':    'cyan',
-        'INFO':     'green',
-        'WARNING':  'yellow',
-        'ERROR':    'red',
+        'DEBUG': 'cyan',
+        'INFO': 'green',
+        'WARNING': 'yellow',
+        'ERROR': 'red',
         'CRITICAL': 'red,bg_white',
     },
     secondary_log_colors={},
@@ -102,31 +102,44 @@ app.add_middleware(
 
 # 首页跳转
 @app.get('/')
-async def main():
+async def index():
     return RedirectResponse('/admin/index.html')
+
+
+@app.get('/favicon.ico')
+async def ico():
+    return RedirectResponse('/admin/favicon.ico')
 
 
 @app.get('/api/getServerVersion')
 async def get_server_version():
-    return resp_200(data={'version': VERSION})
+    return resp_200(data={'version': VERSION}, message='获取版本号成功')
 
 
 @app.middleware("http")
-def add_process_time_header(request: Request, call_next):
+async def add_process_time_header(request: Request, call_next):
     uri = request.url.path
     if 'api' in uri:
         method = request.method
         url = request.base_url
+        # 如果请求方法是 POST，则获取请求的 JSON 数据
+        if request.method == "POST":
+            body = await request.body()
+            # 将请求体解码为字符串
+            body_str = body.decode("utf-8")
+        # 否则，设置为 None
+        else:
+            body_str = None
         logging.info(
             f'\n'
             f'\033[0;31m请求方式：\033[0;32m{method}\033[0m\n'
             f'\033[0;31m请求地址：\033[0;32m{url}\033[0m\n'
             f'\033[0;31m请求接口：\033[0;32m{uri}\033[0m\n'
             f'\033[0;31m请求头：\033[0;32m{request.headers}\033[0m\n'
-            f'\033[0;31m请求入参：\033[0;32m{request.json() if request.method == "POST" else None}\033[0m\n'
+            f'\033[0;31m请求入参：\033[0;32m{body_str}\033[0m\n'
             f'\033[0;31m请求参数：\033[0;32m{request.query_params}\033[0m'
         )
-    response = call_next(request)
+    response = await call_next(request)
     return response
 
 

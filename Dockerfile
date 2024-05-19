@@ -1,4 +1,4 @@
-FROM python:3.11.2-alpine3.17
+FROM python:3.12.3-alpine3.19
 WORKDIR /app
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories\
     && apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev openssl-dev bash\

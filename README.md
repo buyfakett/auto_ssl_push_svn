@@ -14,8 +14,32 @@
 
 ### 使用教程
 
-在项目下的config目录下新建`db.yaml`和`config.yaml`,并配置，然后运行
+在项目下的config目录下新建`config.yaml`,并配置，然后运行
 
+#### `config.yaml`模板
+```yaml
+database:
+  host: 0.0.0.0
+  port: 5432
+  user: postgres
+  password: xxx
+  database: auto_ssl_push_svn
+config:
+  token_private_key: xxx
+  differ_day: 7
+svn:
+  user: xxx
+  passwd: xxx
+  mail: xxx@outlook.com
+server:
+  host: 0.0.0.0
+  password: xxx
+push:
+  type: ding
+  ding_access_token: xxx
+```
+
+#### 启动文件
 ```bash
 docker run -id \
 --name auto_ssl_push_svn \
