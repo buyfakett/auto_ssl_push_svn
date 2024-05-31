@@ -44,5 +44,5 @@ pysvn_util==1.0.2
 pyssh_util==1.0.0
 pyexec_shell==1.0.1
 paramiko==3.4.0
-colorlog
 pycheck_domain==1.0.1
+pyinitlog-util==1.0.0

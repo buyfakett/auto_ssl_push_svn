@@ -12,7 +12,6 @@ from pyresp.pyresp import resp_200
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
-from colorlog import ColoredFormatter
 
 from util.db_ask_ssl import db_ask_ssl
 from api.domain import domain
@@ -21,34 +20,9 @@ from api.server import server
 from api.ssl import ssl
 from api.user import user
 from settings import TORTOISE_ORM
+from pyinitlog_util.pyinitlog_util import init_log
 
-# 日志记录器
-logger = logging.getLogger()
-
-# 设置日志级别，只有大于等于这个级别的日志才能输出
-logger.setLevel(logging.INFO)
-
-# 设置日志格式
-formatter = ColoredFormatter(
-    "%(log_color)s%(levelname)s%(reset)s %(white)s[%(asctime)s]%(reset)s "
-    "%(blue)s[%(filename)s:%(lineno)d]%(reset)s %(message)s",
-    datefmt=None,
-    reset=True,
-    log_colors={
-        'DEBUG': 'cyan',
-        'INFO': 'green',
-        'WARNING': 'yellow',
-        'ERROR': 'red',
-        'CRITICAL': 'red,bg_white',
-    },
-    secondary_log_colors={},
-    style='%'
-)
-
-# 输出到控制台
-to_console = logging.StreamHandler()
-to_console.setFormatter(formatter)
-logger.addHandler(to_console)
+init_log()
 
 # 初始化文件夹
 for init_dir in ['web/static', 'web/admin']:
