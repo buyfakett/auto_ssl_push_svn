@@ -1,0 +1,12 @@
+database:
+  host: localhost
+  port: 5432
+  user: postgres
+  password: password
+  database: auto_ssl_push_svn
+config:
+  token_private_key: xxx
+  differ_day: 7
+cron:
+  hour: 11
+  minute: 0

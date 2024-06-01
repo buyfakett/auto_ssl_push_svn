@@ -21,6 +21,7 @@ from api.ssl import ssl
 from api.user import user
 from settings import TORTOISE_ORM
 from pyinitlog_util.pyinitlog_util import init_log
+from pyconfig_util.config_util import setting
 
 init_log()
 
@@ -35,6 +36,7 @@ with open(os.getcwd() + '/version.py', encoding="utf-8") as f:
     VERSION = version_var['VERSION']
 
 logging.info(f'当前服务端版本为：v{VERSION}')
+logging.info(f'当前定时任务时间为：{setting.CRON_HOUR}:{setting.CRON_MINUTE}')
 
 app = FastAPI(
     openapi_url="/api/openapi.json",
@@ -121,7 +123,7 @@ scheduler = AsyncIOScheduler()
 
 
 # 添加任务到定时调度器
-@scheduler.scheduled_job('cron', hour=11, minute=0)
+@scheduler.scheduled_job('cron', hour=setting.CRON_HOUR, minute=setting.CRON_MINUTE)
 async def cron_job():
     await db_ask_ssl()
 

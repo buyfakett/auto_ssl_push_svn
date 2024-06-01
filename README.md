@@ -37,6 +37,9 @@ server:
 push:
   type: ding
   ding_access_token: xxx
+cron:
+  hour: 11
+  minute: 0
 ```
 
 #### 启动文件
