@@ -46,7 +46,7 @@ cron:
 ```bash
 docker run -id \
 --name auto_ssl_push_svn \
--v ./config/:/app/config/ \
+-v ./config/setting.yaml:/app/config/setting.yaml \
 -v /etc/letsencrypt:/etc/letsencrypt \
 -v ./temp/:/app/temp/ \
 -p 8006:8000 \
