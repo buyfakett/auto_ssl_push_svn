@@ -3,6 +3,7 @@
 # @Time : 2023/11/9 15:36
 import logging
 import os
+import time
 
 import uvicorn
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -95,6 +96,7 @@ async def get_server_version():
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
     uri = request.url.path
+    start_time = time.time()
     if 'api' in uri:
         method = request.method
         url = request.base_url
@@ -116,6 +118,9 @@ async def add_process_time_header(request: Request, call_next):
             f'\033[0;31m请求参数：\033[0;32m{request.query_params}\033[0m'
         )
     response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = str(round(process_time, 5))
+    logging.info(f"\033[0;32m耗时: {str(round(process_time, 5))} s\033[0m")
     return response
 
 
