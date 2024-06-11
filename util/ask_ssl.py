@@ -27,7 +27,7 @@ class SslFunction(object):
         self.server_host = server_host
         self.server_passwd = server_passwd
 
-    def ask_ssl(self, aliyun_access_key: str, aliyun_access_secret: str, domain: str, ssl_id: int):
+    def ask_aliyun_ssl(self, aliyun_access_key: str, aliyun_access_secret: str, domain: str, ssl_id: int):
         """
         获取ssl证书
         :param aliyun_access_key:       阿里云access_key
@@ -38,7 +38,7 @@ class SslFunction(object):
             f.write(f'dns_aliyun_access_key = {aliyun_access_key}\n')
             f.write(f'dns_aliyun_access_key_secret = {aliyun_access_secret}')
         with open('./temp/' + 'setup.sh', encoding="utf-8", mode="a") as f:
-            f.write('docker run -id --rm \\\n')
+            f.write('docker run -i --rm \\\n')
             f.write('--name certbot \\\n')
             f.write('-v /etc/letsencrypt:/etc/letsencrypt \\\n')
             f.write('-v /auto_ssl_push_svn/credentials.ini:/data/credentials.ini \\\n')
@@ -48,8 +48,7 @@ class SslFunction(object):
             f.write(f' -d {domain} -m {self.mail} \\\n')
             f.write('--non-interactive \\\n')
             f.write('--agree-tos \\\n')
-            f.write('--preferred-challenges dns \\\n')
-            f.write("--manual-cleanup-hook 'aliyun-dns clean'")
+        exec_shell('chmod 600 ./temp/credentials.ini')
         # 复制配置文件到运行目录
         ssh = SSHClient(host=self.server_host, password=self.server_passwd)
         ssh.execute_command('mkdir /auto_ssl_push_svn')

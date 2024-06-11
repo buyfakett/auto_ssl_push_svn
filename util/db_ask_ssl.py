@@ -34,20 +34,23 @@ async def db_ask_ssl(ssl_id: Optional[int] = None):
                 ask_ssl = False
             if ask_flag:
                 first_domain_data = await first_domain.get(id=ssl_data.first_domain_id)
-                ask_ssl = SslFunction()
-                # 获取ssl证书
-                if ask_ssl.ask_ssl(aliyun_access_key=first_domain_data.domain_account_key,
-                                   aliyun_access_secret=first_domain_data.domain_account_secret,
-                                   domain=ssl_data.certificate_domain,
-                                   ssl_id=ssl_data.id):
-                    list_server = ast.literal_eval(ssl_data.server_ids)
-                    servers = await Server.filter(id__in=list_server)
-                    for server in servers:
-                        logging.info('本次上传：' + server.hostname)
-                        # 分发证书
-                        ask_ssl.upload_svn(hostname=server.hostname,
-                                           repo_url=server.webroot,
-                                           domain=ssl_data.certificate_domain)
+                if first_domain_data.domain_manufacturer == 'ali':
+                    ask_ssl = SslFunction()
+                    # 获取ssl证书
+                    if ask_ssl.ask_aliyun_ssl(aliyun_access_key=first_domain_data.domain_account_key,
+                                       aliyun_access_secret=first_domain_data.domain_account_secret,
+                                       domain=ssl_data.certificate_domain,
+                                       ssl_id=ssl_data.id):
+                        list_server = ast.literal_eval(ssl_data.server_ids)
+                        servers = await Server.filter(id__in=list_server)
+                        for server in servers:
+                            logging.info('本次上传：' + server.hostname)
+                            # 分发证书
+                            ask_ssl.upload_svn(hostname=server.hostname,
+                                               repo_url=server.webroot,
+                                               domain=ssl_data.certificate_domain)
+                else:
+                    logging.error('域名厂商暂时不支持')
     else:
         ssl_data = await Ssl.get(id=ssl_id)
         # 如果证书到期时间为空或者配置的天内过期，就续费
@@ -65,17 +68,20 @@ async def db_ask_ssl(ssl_id: Optional[int] = None):
             ask_ssl = False
         if ask_flag:
             first_domain_data = await first_domain.get(id=ssl_data.first_domain_id)
-            ask_ssl = SslFunction()
-            # 获取ssl证书
-            if ask_ssl.ask_ssl(aliyun_access_key=first_domain_data.domain_account_key,
-                               aliyun_access_secret=first_domain_data.domain_account_secret,
-                               domain=ssl_data.certificate_domain,
-                               ssl_id=ssl_data.id):
-                list_server = ast.literal_eval(ssl_data.server_ids)
-                servers = await Server.filter(id__in=list_server)
-                for server in servers:
-                    logging.info('本次上传：' + server.hostname)
-                    # 分发证书
-                    ask_ssl.upload_svn(hostname=server.hostname,
-                                       repo_url=server.webroot,
-                                       domain=ssl_data.certificate_domain)
+            if first_domain_data.domain_manufacturer == 'ali':
+                ask_ssl = SslFunction()
+                # 获取ssl证书
+                if ask_ssl.ask_aliyun_ssl(aliyun_access_key=first_domain_data.domain_account_key,
+                                   aliyun_access_secret=first_domain_data.domain_account_secret,
+                                   domain=ssl_data.certificate_domain,
+                                   ssl_id=ssl_data.id):
+                    list_server = ast.literal_eval(ssl_data.server_ids)
+                    servers = await Server.filter(id__in=list_server)
+                    for server in servers:
+                        logging.info('本次上传：' + server.hostname)
+                        # 分发证书
+                        ask_ssl.upload_svn(hostname=server.hostname,
+                                           repo_url=server.webroot,
+                                           domain=ssl_data.certificate_domain)
+            else:
+                logging.error('域名厂商暂时不支持')
