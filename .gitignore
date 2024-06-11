@@ -6,3 +6,4 @@ migrations
 static
 pyproject.toml
 web/
+temp/
