@@ -33,6 +33,7 @@ class SslFunction(object):
         :param aliyun_access_key:       阿里云access_key
         :param aliyun_access_secret:    阿里云access_secret
         :param domain:                  域名
+        :param ssl_id:                  证书id
         """
         with open('./temp/' + 'credentials.ini', encoding="utf-8", mode="a") as f:
             f.write(f'dns_aliyun_access_key = {aliyun_access_key}\n')
@@ -45,7 +46,7 @@ class SslFunction(object):
         ssh.upload_and_execute_script(os.getcwd() + '/scripts/ask_aliyun_ssl.sh', '/auto_ssl_push_svn/setup.sh')
         os.remove(os.getcwd() + '/temp/credentials.ini')
         # 运行申请证书容器
-        exec_shell(f'/bin/bash /auto_ssl_push_svn/setup.sh {self.mail} {domain}')
+        exec_shell(f'cd /auto_ssl_push_svn && chmod +x setup.sh && ./setup.sh {self.mail} {domain}')
         # 判断是否是泛域名，如果是泛域名生成的文件夹是不带*的
         if not domain.startswith('*'):
             ssl_path = f'/auto_ssl_push_svn/letsencrypt/live/{domain}'

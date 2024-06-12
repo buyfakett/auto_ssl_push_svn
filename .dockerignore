@@ -1,3 +1,5 @@
 .idea
 venv
 .git
+__pycache__
+pyproject.toml
