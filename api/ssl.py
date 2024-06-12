@@ -24,6 +24,7 @@ class SslModelList(BaseModel):
     register_time: Optional[datetime]
     exp_time: Optional[datetime]
     percentage: Optional[int] = Field(0, alias="percentage")
+    remainder_days: Optional[int] = Field(0, alias="remainder_days")
     status: int
 
     class Config:
@@ -58,6 +59,7 @@ async def get_ssl():
             # 计算百分比
             percentage = int(delta_days / 365 * 100)
             ssl_dict['percentage'] = percentage
+            ssl_dict['remainder_days'] = delta_days
         else:
             ssl_dict['percentage'] = None
         data_list.append(ssl_dict)
