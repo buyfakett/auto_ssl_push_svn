@@ -44,10 +44,10 @@ class SslFunction(object):
         ssh.execute_command('mkdir -p /auto_ssl_push_svn')
         ssh.upload_file(os.getcwd() + '/temp/credentials.ini', '/auto_ssl_push_svn/credentials.ini')
         ssh.upload_file(os.getcwd() + '/scripts/ask_aliyun_ssl.sh', '/auto_ssl_push_svn/setup.sh')
-        ssh.close()
         os.remove(os.getcwd() + '/temp/credentials.ini')
         # 运行申请证书容器
-        exec_shell(f'cd /auto_ssl_push_svn && chmod +x setup.sh && ./setup.sh {self.mail} {domain}')
+        ssh.execute_command(f'cd /auto_ssl_push_svn && chmod +x setup.sh && ./setup.sh {self.mail} {domain}')
+        ssh.close()
         # 判断是否是泛域名，如果是泛域名生成的文件夹是不带*的
         if not domain.startswith('*'):
             ssl_path = f'/auto_ssl_push_svn/letsencrypt/live/{domain}'
