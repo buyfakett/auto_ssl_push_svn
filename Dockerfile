@@ -23,13 +23,12 @@ COPY --from=front-builder /app/web/ /app/web/
 
 FROM python:3.12.3-alpine3.19 as runner
 WORKDIR /app
-COPY requirements.txt .
+COPY --from=backend-builder /app/ /app/
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel gunicorn \
     && pip install --no-cache-dir -r requirements.txt
 RUN apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev openssl-dev bash \
     && apk add --no-cache libffi openssl subversion \
     && apk del .build-deps
-COPY --from=backend-builder /app/ /app/
 RUN rm -f /etc/localtime && ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' > /etc/timezone
 CMD uvicorn main:app --host 0.0.0.0 --port 8000
 EXPOSE 8000
