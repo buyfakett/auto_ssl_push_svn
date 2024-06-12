@@ -24,7 +24,7 @@ class SslModelList(BaseModel):
     register_time: Optional[datetime]
     exp_time: Optional[datetime]
     percentage: Optional[int] = Field(0, alias="percentage")
-    remainder_days: Optional[int] = Field(0, alias="remainder_days")
+    remainder_days: Optional[str] = Field(0, alias="remainder_days")
     status: int
 
     class Config:
@@ -45,6 +45,8 @@ async def get_ssl():
         logging.error(f"Error fetching ssl: {e}")
         return resp_400(message='查询错误')
     data_list = []
+    # 获取当前时间
+    current_time = datetime.now()
     for ssl in ssls:
         ssl_dict = SslModelList.from_orm(ssl).dict()
         # 序列化 datetime 字段
@@ -52,16 +54,17 @@ async def get_ssl():
         ssl_dict['exp_time'] = serialize_datetime(ssl_dict['exp_time'])
         if ssl_dict['register_time'] and ssl_dict['exp_time']:
             # 解析日期
-            start_datetime = datetime.strptime(ssl_dict['register_time'], "%Y-%m-%d")
             end_datetime = datetime.strptime(ssl_dict['exp_time'], "%Y-%m-%d")
             # 计算日期差
-            delta_days = (end_datetime - start_datetime).days
+            delta_days = (end_datetime - current_time).days
             # 计算百分比
             percentage = int(delta_days / 365 * 100)
+
             ssl_dict['percentage'] = percentage
             ssl_dict['remainder_days'] = delta_days
         else:
             ssl_dict['percentage'] = None
+            ssl_dict['remainder_days'] = None
         data_list.append(ssl_dict)
     response_data = {
         'items': data_list,
