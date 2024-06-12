@@ -50,10 +50,10 @@ class SslFunction(object):
         ssh.close()
         # 判断是否是泛域名，如果是泛域名生成的文件夹是不带*的
         if not domain.startswith('*'):
-            ssl_path = f'/auto_ssl_push_svn/letsencrypt/live/{domain}'
+            ssl_path = f'/auto_ssl_push_svn/letsencrypt/live/{domain}/'
         else:
-            ssl_path = f'/auto_ssl_push_svn/letsencrypt/live/{domain[2:]}'
-        if not check_file(ssl_path, 'cert*.pem'):
+            ssl_path = f'/auto_ssl_push_svn/letsencrypt/live/{domain[2:]}/'
+        if not check_file(ssl_path, 'cert.pem'):
             logging.error(f'没有成功申请证书 {domain}，原因未知')
             return False
         try:
@@ -62,7 +62,7 @@ class SslFunction(object):
             # 处理异常，可以打印或记录错误信息
             logging.error(f"Error fetching server: {e}")
             return False
-        start_time, end_time = check_ssl(ssl_path + '/cert*.pem')
+        start_time, end_time = check_ssl(ssl_path + 'cert.pem')
         if end_time - ssl_data.exp_time <= int(setting.CONFIG_DIFFER_DAY):
             logging.error(f'没有成功申请证书 {domain}，证书到期时间比设定时间更短')
             return False
@@ -96,13 +96,13 @@ class SslFunction(object):
 
         # 判断是否是泛域名，如果是泛域名生成的文件夹是不带*的
         if not domain.startswith('*'):
-            exec_shell(f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain}/cert*.pem /app/temp/svn/{hostname}/ssl/{domain}.cer')
-            exec_shell(f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain}/fullchain*.pem /app/temp/svn/{hostname}/ssl/{domain}.key')
+            exec_shell(f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain}/cert.pem /app/temp/svn/{hostname}/ssl/{domain}.cer')
+            exec_shell(f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain}/fullchain.pem /app/temp/svn/{hostname}/ssl/{domain}.key')
             svn_client.add(f"/app/temp/svn/{hostname}/ssl/{domain}.key")
             svn_client.add(f"/app/temp/svn/{hostname}/ssl/{domain}.cer")
         else:
-            exec_shell(f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain[2:]}/cert*.pem /app/temp/svn/{hostname}/ssl/_{domain[1:]}.cer')
-            exec_shell(f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain[2:]}/fullchain*.pem /app/temp/svn/{hostname}/ssl/_{domain[1:]}.key')
+            exec_shell(f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain[2:]}/cert.pem /app/temp/svn/{hostname}/ssl/_{domain[1:]}.cer')
+            exec_shell(f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain[2:]}/fullchain.pem /app/temp/svn/{hostname}/ssl/_{domain[1:]}.key')
             svn_client.add(f"/app/temp/svn/{hostname}/ssl/_{domain[1:]}.key")
             svn_client.add(f"/app/temp/svn/{hostname}/ssl/_{domain[1:]}.cer")
 
