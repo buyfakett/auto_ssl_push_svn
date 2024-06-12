@@ -37,32 +37,20 @@ class SslFunction(object):
         with open('./temp/' + 'credentials.ini', encoding="utf-8", mode="a") as f:
             f.write(f'dns_aliyun_access_key = {aliyun_access_key}\n')
             f.write(f'dns_aliyun_access_key_secret = {aliyun_access_secret}')
-        with open('./temp/' + 'setup.sh', encoding="utf-8", mode="a") as f:
-            f.write('docker run -i --rm \\\n')
-            f.write('--name certbot \\\n')
-            f.write('-v /etc/letsencrypt:/etc/letsencrypt \\\n')
-            f.write('-v /auto_ssl_push_svn/credentials.ini:/data/credentials.ini \\\n')
-            f.write('-v /auto_ssl_push_svn/log/:/var/log/letsencrypt/ \\\n')
-            f.write('registry.cn-hangzhou.aliyuncs.com/buyfakett/certbot-dns-aliyun \\\n')
-            f.write("certonly --authenticator=dns-aliyun --dns-aliyun-credentials='/data/credentials.ini' \\\n")
-            f.write(f' -d {domain} -m {self.mail} \\\n')
-            f.write('--non-interactive \\\n')
-            f.write('--agree-tos \\\n')
         exec_shell('chmod 600 ./temp/credentials.ini')
         # 复制配置文件到运行目录
         ssh = SSHClient(host=self.server_host, password=self.server_passwd)
         ssh.execute_command('mkdir /auto_ssl_push_svn')
         ssh.upload_file(os.getcwd() + '/temp/credentials.ini', '/auto_ssl_push_svn/credentials.ini')
-        ssh.upload_and_execute_script(os.getcwd() + '/temp/setup.sh', '/auto_ssl_push_svn/setup.sh')
+        ssh.upload_and_execute_script(os.getcwd() + '/scripts/ask_aliyun_ssl.sh', '/auto_ssl_push_svn/setup.sh')
         os.remove(os.getcwd() + '/temp/credentials.ini')
-        os.remove(os.getcwd() + '/temp/setup.sh')
         # 运行申请证书容器
-        exec_shell('/bin/bash /auto_ssl_push_svn/setup.sh')
+        exec_shell(f'/bin/bash /auto_ssl_push_svn/setup.sh {self.mail} {domain}')
         # 判断是否是泛域名，如果是泛域名生成的文件夹是不带*的
         if not domain.startswith('*'):
-            ssl_path = f'/etc/letsencrypt/live/{domain}'
+            ssl_path = f'/auto_ssl_push_svn/letsencrypt/live/{domain}'
         else:
-            ssl_path = f'/etc/letsencrypt/live/{domain[2:]}'
+            ssl_path = f'/auto_ssl_push_svn/letsencrypt/live/{domain[2:]}'
         if not check_file(ssl_path, 'cert*.pem'):
             logging.error(f'没有成功申请证书 {domain}，原因未知')
             return False
@@ -106,13 +94,13 @@ class SslFunction(object):
 
         # 判断是否是泛域名，如果是泛域名生成的文件夹是不带*的
         if not domain.startswith('*'):
-            exec_shell(f'cp -f /etc/letsencrypt/live/{domain}/cert*.pem /app/temp/svn/{hostname}/ssl/{domain}.cer')
-            exec_shell(f'cp -f /etc/letsencrypt/live/{domain}/privkey*.pem /app/temp/svn/{hostname}/ssl/{domain}.key')
+            exec_shell(f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain}/cert*.pem /app/temp/svn/{hostname}/ssl/{domain}.cer')
+            exec_shell(f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain}/fullchain*.pem /app/temp/svn/{hostname}/ssl/{domain}.key')
             svn_client.add(f"/app/temp/svn/{hostname}/ssl/{domain}.key")
             svn_client.add(f"/app/temp/svn/{hostname}/ssl/{domain}.cer")
         else:
-            exec_shell(f'cp -f /etc/letsencrypt/live/{domain[2:]}/cert*.pem /app/temp/svn/{hostname}/ssl/_{domain[1:]}.cer')
-            exec_shell(f'cp -f /etc/letsencrypt/live/{domain[2:]}/privkey*.pem /app/temp/svn/{hostname}/ssl/_{domain[1:]}.key')
+            exec_shell(f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain[2:]}/cert*.pem /app/temp/svn/{hostname}/ssl/_{domain[1:]}.cer')
+            exec_shell(f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain[2:]}/fullchain*.pem /app/temp/svn/{hostname}/ssl/_{domain[1:]}.key')
             svn_client.add(f"/app/temp/svn/{hostname}/ssl/_{domain[1:]}.key")
             svn_client.add(f"/app/temp/svn/{hostname}/ssl/_{domain[1:]}.cer")
 
