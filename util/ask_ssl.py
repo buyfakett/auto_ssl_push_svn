@@ -40,7 +40,7 @@ class SslFunction(object):
         exec_shell('chmod 600 ./temp/credentials.ini')
         # 复制配置文件到运行目录
         ssh = SSHClient(host=self.server_host, password=self.server_passwd)
-        ssh.execute_command('mkdir /auto_ssl_push_svn')
+        ssh.execute_command('mkdir -p /auto_ssl_push_svn')
         ssh.upload_file(os.getcwd() + '/temp/credentials.ini', '/auto_ssl_push_svn/credentials.ini')
         ssh.upload_and_execute_script(os.getcwd() + '/scripts/ask_aliyun_ssl.sh', '/auto_ssl_push_svn/setup.sh')
         os.remove(os.getcwd() + '/temp/credentials.ini')
