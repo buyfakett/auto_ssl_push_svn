@@ -13,8 +13,7 @@ from datetime import datetime
 from util.db_ask_ssl import db_ask_ssl
 from pyoauth2_util.oauth2 import verify_token
 
-# ssl = APIRouter(dependencies=[Depends(verify_token)])
-ssl = APIRouter()
+ssl = APIRouter(dependencies=[Depends(verify_token)])
 
 
 class SslModelList(BaseModel):
