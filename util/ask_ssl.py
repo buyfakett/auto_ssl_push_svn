@@ -44,6 +44,7 @@ class SslFunction(object):
         ssh.execute_command('mkdir -p /auto_ssl_push_svn')
         ssh.upload_file(os.getcwd() + '/temp/credentials.ini', '/auto_ssl_push_svn/credentials.ini')
         ssh.upload_file(os.getcwd() + '/scripts/ask_aliyun_ssl.sh', '/auto_ssl_push_svn/setup.sh')
+        ssh.close()
         os.remove(os.getcwd() + '/temp/credentials.ini')
         # 运行申请证书容器
         exec_shell(f'cd /auto_ssl_push_svn && chmod +x setup.sh && ./setup.sh {self.mail} {domain}')
