@@ -13,7 +13,8 @@ from datetime import datetime
 from util.db_ask_ssl import db_ask_ssl
 from pyoauth2_util.oauth2 import verify_token
 
-ssl = APIRouter(dependencies=[Depends(verify_token)])
+# ssl = APIRouter(dependencies=[Depends(verify_token)])
+ssl = APIRouter()
 
 
 class SslModelList(BaseModel):
@@ -126,7 +127,6 @@ class EditSslModel(BaseModel):
     first_domain_id: int
     server_ids: List[int]
     certificate_domain: str
-    status: int
 
 
 @ssl.post('/edit', summary='编辑证书')
@@ -148,7 +148,47 @@ async def edit_ssl(item: EditSslModel):
     old_data.first_domain_id = item.first_domain_id
     old_data.certificate_domain = item.certificate_domain
     old_data.server_ids = item.server_ids
-    old_data.status = item.status
+    try:
+        await old_data.save()
+    except Exception as e:
+        logging.error(f"Error fetching ssl: {e}")
+        return resp_400(message='修改错误')
+    retrieved_data = await Ssl.get_or_none(id=item.id)  # 使用刚刚创建的数据的ID
+    resp_data = {
+        'id': retrieved_data.id,
+        'first_domain_id': retrieved_data.first_domain_id,
+        'server_ids': retrieved_data.server_ids,
+        'certificate_domain': retrieved_data.certificate_domain,
+        'status': retrieved_data.status
+    }
+    return resp_200(data=resp_data, message='修改成功')
+
+
+class EditSslStatusModel(BaseModel):
+    id: int
+    status: int
+
+
+@ssl.post('/edit_status', summary='编辑证书状态')
+async def edit_status(item: EditSslStatusModel):
+    try:
+        old_data = await Ssl.get(id=item.id)
+    except Exception as e:
+        logging.error(f"Error fetching domains: {e}")
+        return resp_400(message='没有查到该条数据')
+    # 关闭检测
+    if item.status == 0:
+        old_data.status = 0
+    # 开启检测
+    elif item.status == 1:
+        # 获取当前时间
+        current_time = datetime.now()
+        if (datetime.strptime(str(old_data.exp_time), "%Y-%m-%d") - current_time).days >= 0:
+            old_data.status = 1
+        else:
+            old_data.status = 2
+    else:
+        return resp_400(message='非法传参')
     try:
         await old_data.save()
     except Exception as e:
