@@ -27,7 +27,7 @@ class SslFunction(object):
         self.server_host = server_host
         self.server_passwd = server_passwd
 
-    def ask_aliyun_ssl(self, aliyun_access_key: str, aliyun_access_secret: str, domain: str, ssl_id: int):
+    async def ask_aliyun_ssl(self, aliyun_access_key: str, aliyun_access_secret: str, domain: str, ssl_id: int):
         """
         获取ssl证书
         :param aliyun_access_key:       阿里云access_key
@@ -57,18 +57,22 @@ class SslFunction(object):
             logging.error(f'没有成功申请证书 {domain}，原因未知')
             return False
         try:
-            ssl_data = Ssl.get(id=ssl_id)
+            ssl_data = await Ssl.get(id=ssl_id)
         except Exception as e:
             # 处理异常，可以打印或记录错误信息
             logging.error(f"Error fetching server: {e}")
             return False
         start_time, end_time = check_ssl(ssl_path + 'fullchain.pem')
+        if ssl_data.exp_time is not None:
+            if int((end_time - ssl_data.exp_time).days) <= int(setting.CONFIG_DIFFER_DAY):
+                logging.error(f'没有成功申请证书 {domain}，证书到期时间比设定时间更短')
+                return False
         # 更新证书的到期时间
         ssl_data.status = 1
         ssl_data.register_time = start_time
         ssl_data.exp_time = end_time
         try:
-            ssl_data.save()
+            await ssl_data.save()
         except Exception as e:
             logging.error(f"Error fetching ssl: {e}")
             return False
