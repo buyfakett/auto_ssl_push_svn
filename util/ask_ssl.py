@@ -38,7 +38,7 @@ class SslFunction(object):
         with open('./temp/' + 'aliyun.ini', encoding="utf-8", mode="a") as f:
             f.write(f'dns_aliyun_access_key = {aliyun_access_key}\n')
             f.write(f'dns_aliyun_access_key_secret = {aliyun_access_secret}')
-        exec_shell(f'chmod 600 {os.getcwd()}/temp/credentials.ini')
+        exec_shell(f'chmod 600 {os.getcwd()}/temp/aliyun.ini')
         # 复制配置文件到运行目录
         ssh = SSHClient(host=self.server_host, password=self.server_passwd)
         ssh.execute_command('mkdir -p /auto_ssl_push_svn')
@@ -63,10 +63,6 @@ class SslFunction(object):
             logging.error(f"Error fetching server: {e}")
             return False
         start_time, end_time = check_ssl(ssl_path + 'fullchain.pem')
-        if ssl_data.exp_time is not None:
-            if int((end_time - ssl_data.exp_time).days) <= int(setting.CONFIG_DIFFER_DAY):
-                logging.error(f'没有成功申请证书 {domain}，证书到期时间比设定时间更短')
-                return False
         # 更新证书的到期时间
         ssl_data.status = 1
         ssl_data.register_time = start_time
