@@ -37,7 +37,7 @@ async def db_ask_ssl(ssl_id: Optional[int] = None):
                 if first_domain_data.domain_manufacturer == 'ali':
                     ask_ssl = SslFunction()
                     # 获取ssl证书
-                    if ask_ssl.ask_aliyun_ssl(aliyun_access_key=first_domain_data.domain_account_key,
+                    if await ask_ssl.ask_aliyun_ssl(aliyun_access_key=first_domain_data.domain_account_key,
                                        aliyun_access_secret=first_domain_data.domain_account_secret,
                                        domain=ssl_data.certificate_domain,
                                        ssl_id=ssl_data.id):
@@ -71,7 +71,7 @@ async def db_ask_ssl(ssl_id: Optional[int] = None):
             if first_domain_data.domain_manufacturer == 'ali':
                 ask_ssl = SslFunction()
                 # 获取ssl证书
-                if ask_ssl.ask_aliyun_ssl(aliyun_access_key=first_domain_data.domain_account_key,
+                if await ask_ssl.ask_aliyun_ssl(aliyun_access_key=first_domain_data.domain_account_key,
                                    aliyun_access_secret=first_domain_data.domain_account_secret,
                                    domain=ssl_data.certificate_domain,
                                    ssl_id=ssl_data.id):
