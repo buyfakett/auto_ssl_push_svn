@@ -63,9 +63,10 @@ class SslFunction(object):
             logging.error(f"Error fetching server: {e}")
             return False
         start_time, end_time = check_ssl(ssl_path + 'fullchain.pem')
-        if int((end_time - ssl_data.exp_time).days) <= int(setting.CONFIG_DIFFER_DAY):
-            logging.error(f'没有成功申请证书 {domain}，证书到期时间比设定时间更短')
-            return False
+        if ssl_data.exp_time is not None:
+            if int((end_time - ssl_data.exp_time).days) <= int(setting.CONFIG_DIFFER_DAY):
+                logging.error(f'没有成功申请证书 {domain}，证书到期时间比设定时间更短')
+                return False
         # 更新证书的到期时间
         ssl_data.status = 1
         ssl_data.register_time = start_time
@@ -96,13 +97,17 @@ class SslFunction(object):
 
         # 判断是否是泛域名，如果是泛域名生成的文件夹是不带*的
         if not domain.startswith('*'):
-            exec_shell(f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain}/fullchain.pem /app/temp/svn/{hostname}/ssl/{domain}.cer')
-            exec_shell(f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain}/privkey.pem /app/temp/svn/{hostname}/ssl/{domain}.key')
+            exec_shell(
+                f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain}/fullchain.pem /app/temp/svn/{hostname}/ssl/{domain}.cer')
+            exec_shell(
+                f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain}/privkey.pem /app/temp/svn/{hostname}/ssl/{domain}.key')
             svn_client.add(f"/app/temp/svn/{hostname}/ssl/{domain}.key")
             svn_client.add(f"/app/temp/svn/{hostname}/ssl/{domain}.cer")
         else:
-            exec_shell(f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain[2:]}/fullchain.pem /app/temp/svn/{hostname}/ssl/_{domain[1:]}.cer')
-            exec_shell(f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain[2:]}/privkey.pem /app/temp/svn/{hostname}/ssl/_{domain[1:]}.key')
+            exec_shell(
+                f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain[2:]}/fullchain.pem /app/temp/svn/{hostname}/ssl/_{domain[1:]}.cer')
+            exec_shell(
+                f'cp -f /auto_ssl_push_svn/letsencrypt/live/{domain[2:]}/privkey.pem /app/temp/svn/{hostname}/ssl/_{domain[1:]}.key')
             svn_client.add(f"/app/temp/svn/{hostname}/ssl/_{domain[1:]}.key")
             svn_client.add(f"/app/temp/svn/{hostname}/ssl/_{domain[1:]}.cer")
 
