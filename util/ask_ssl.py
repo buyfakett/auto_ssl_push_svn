@@ -38,7 +38,7 @@ class SslFunction(object):
         with open('./temp/' + 'aliyun.ini', encoding="utf-8", mode="a") as f:
             f.write(f'dns_aliyun_access_key = {aliyun_access_key}\n')
             f.write(f'dns_aliyun_access_key_secret = {aliyun_access_secret}')
-        exec_shell('chmod 600 ./temp/credentials.ini')
+        exec_shell(f'chmod 600 {os.getcwd()}/temp/credentials.ini')
         # 复制配置文件到运行目录
         ssh = SSHClient(host=self.server_host, password=self.server_passwd)
         ssh.execute_command('mkdir -p /auto_ssl_push_svn')
