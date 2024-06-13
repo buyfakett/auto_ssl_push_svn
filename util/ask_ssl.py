@@ -63,7 +63,7 @@ class SslFunction(object):
             logging.error(f"Error fetching server: {e}")
             return False
         start_time, end_time = check_ssl(ssl_path + 'fullchain.pem')
-        if end_time - ssl_data.exp_time <= int(setting.CONFIG_DIFFER_DAY):
+        if int((end_time - ssl_data.exp_time).days) <= int(setting.CONFIG_DIFFER_DAY):
             logging.error(f'没有成功申请证书 {domain}，证书到期时间比设定时间更短')
             return False
         # 更新证书的到期时间
