@@ -91,9 +91,9 @@ class SslFunction(object):
         svn_client = SVNClient(repo_url=repo_url, working_copy_path=os.getcwd() + '/temp/svn',
                                username=self.svn_user, password=self.svn_passwd)
         checkout_output, checkout_error, checkout_code = svn_client.checkout()
-        logging.info(f'检出日志: {checkout_output}')
-        logging.error(f'检出错误: {checkout_error}')
-        logging.info(f'检出返回码: {checkout_code}')
+        logging.info(f'检出日志: \n{checkout_output}')
+        logging.error(f'检出错误: \n{checkout_error}')
+        logging.info(f'检出返回码: \n{checkout_code}')
 
         # 判断是否是泛域名，如果是泛域名生成的文件夹是不带*的
         if not domain.startswith('*'):
@@ -112,9 +112,9 @@ class SslFunction(object):
             svn_client.add(f"/app/temp/svn/{hostname}/ssl/_{domain[1:]}.cer")
 
         commit_output, commit_error, commit_code = svn_client.commit(f'更新{domain}证书')
-        logging.info(f'提交日志: {commit_output}')
-        logging.error(f'提交错误: {commit_error}')
-        logging.info(f'提交返回码: {commit_code}')
+        logging.info(f'提交日志: \n{commit_output}')
+        logging.error(f'提交错误: \n{commit_error}')
+        logging.info(f'提交返回码: \n{commit_code}')
 
         message = f' {domain} 证书更新成功，已推送至 {repo_url} ！！！'
         if setting.PUSH_TYPE == 'ding':
