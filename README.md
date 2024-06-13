@@ -47,7 +47,7 @@ cron:
 docker run -id \
 --name auto_ssl_push_svn \
 -v ./config/setting.yaml:/app/config/setting.yaml \
--v /etc/letsencrypt:/etc/letsencrypt \
+-v /auto_ssl_push_svn:/auto_ssl_push_svn \
 -v ./temp/:/app/temp/ \
 -p 8006:8000 \
 buyfakett/auto_ssl_push_svn
