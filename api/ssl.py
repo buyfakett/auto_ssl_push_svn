@@ -54,11 +54,12 @@ async def get_ssl():
         ssl_dict['exp_time'] = serialize_datetime(ssl_dict['exp_time'])
         if ssl_dict['register_time'] and ssl_dict['exp_time']:
             # 解析日期
+            start_datetime = datetime.strptime(ssl_dict['register_time'], "%Y-%m-%d")
             end_datetime = datetime.strptime(ssl_dict['exp_time'], "%Y-%m-%d")
             # 计算日期差
             delta_days = (end_datetime - current_time).days
             # 计算百分比
-            percentage = int(delta_days / 365 * 100)
+            percentage = "{:.2f}".format(delta_days / (end_datetime - start_datetime).days * 100)
 
             ssl_dict['percentage'] = percentage
             ssl_dict['remainder_days'] = delta_days
