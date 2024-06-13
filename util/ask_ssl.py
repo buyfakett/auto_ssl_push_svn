@@ -4,6 +4,7 @@
 import json
 import logging
 import os
+from datetime import datetime
 
 import requests
 from pyexec_shell.exec_shell import exec_shell, check_file
@@ -63,6 +64,7 @@ class SslFunction(object):
             logging.error(f"Error fetching server: {e}")
             return False
         start_time, end_time = check_ssl(ssl_path + 'fullchain.pem')
+        end_time = datetime.strptime(end_time, "%Y-%m-%d").date()
         if ssl_data.exp_time is not None:
             if int((end_time - ssl_data.exp_time).days) <= int(setting.CONFIG_DIFFER_DAY):
                 logging.error(f'没有成功申请证书 {domain}，证书到期时间比设定时间更短')
