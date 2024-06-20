@@ -57,9 +57,9 @@ async def get_ssl():
             start_datetime = datetime.strptime(ssl_dict['register_time'], "%Y-%m-%d")
             end_datetime = datetime.strptime(ssl_dict['exp_time'], "%Y-%m-%d")
             # 计算日期差
-            delta_days = (end_datetime - current_time).days
+            delta_days = (end_datetime - current_time).days + 1
             # 计算百分比
-            percentage = "{:.0f}".format((delta_days + 1) / (end_datetime - start_datetime).days * 100)
+            percentage = "{:.0f}".format(delta_days / (end_datetime - start_datetime).days * 100)
 
             ssl_dict['percentage'] = percentage
             ssl_dict['remainder_days'] = delta_days
