@@ -11,6 +11,14 @@ from pyoauth2_util.oauth2 import verify_token
 
 domain = APIRouter(dependencies=[Depends(verify_token)])
 
+manufacturer_list = [{
+        "value": 'ali',
+        "label": '阿里云'
+    }, {
+        "value": 'aws',
+        "label": '亚马逊云'
+}]
+
 
 class DomainModelList(BaseModel):
     id: int
@@ -53,6 +61,11 @@ async def get_domain():
     return resp_200(data=response_data, message='查询成功')
 
 
+@domain.get('/manufacturer/list', summary='支持域名列表')
+async def get_manufacturer():
+    return resp_200(data=manufacturer_list)
+
+
 class AddDomainModel(BaseModel):
     domain: str
     domain_manufacturer: str
@@ -63,7 +76,7 @@ class AddDomainModel(BaseModel):
 
 @domain.put('/add', summary='添加域名')
 async def add_domain(item: AddDomainModel):
-    if item.domain_manufacturer != 'ali':
+    if not any(manufacturer['value'] == item.domain_manufacturer for manufacturer in manufacturer_list):
         return resp_400(401, '暂时不支持该厂商域名')
     try:
         add_data = await first_domain.create(**item.dict())
@@ -107,7 +120,7 @@ class EditDomainModel(BaseModel):
 
 @domain.post('/edit', summary='编辑域名')
 async def edit_domain(item: EditDomainModel):
-    if item.domain_manufacturer != 'ali':
+    if not any(manufacturer['value'] == item.domain_manufacturer for manufacturer in manufacturer_list):
         return resp_400(401, '暂时不支持该厂商域名')
     try:
         old_data = await first_domain.get(id=item.id)
