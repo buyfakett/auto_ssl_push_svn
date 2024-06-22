@@ -63,7 +63,7 @@ async def get_domain():
 
 @domain.get('/manufacturer/list', summary='支持域名列表')
 async def get_manufacturer():
-    return resp_200(data=manufacturer_list)
+    return resp_200(data=manufacturer_list, message='查询成功')
 
 
 class AddDomainModel(BaseModel):
