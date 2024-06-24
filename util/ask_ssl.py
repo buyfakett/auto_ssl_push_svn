@@ -28,20 +28,21 @@ class SslFunction(object):
         self.server_host = server_host
         self.server_passwd = server_passwd
 
-    async def ask_aliyun_ssl(self, aliyun_access_key: str, aliyun_access_secret: str, domain: str, ssl_id: int):
+    async def ask_ssl(self, access_key: str, access_secret: str, domain: str, ssl_id: int, domain_manufacturer: str):
         """
         获取ssl证书
-        :param aliyun_access_key:       阿里云access_key
-        :param aliyun_access_secret:    阿里云access_secret
+        :param access_key:              access_key
+        :param access_secret:           access_secret
         :param domain:                  域名
         :param ssl_id:                  证书id
+        :param domain_manufacturer:     证书厂商
         """
         # 复制配置文件到运行目录
         ssh = SSHClient(host=self.server_host, password=self.server_passwd)
         ssh.execute_command('mkdir -p /auto_ssl_push_svn')
-        ssh.upload_file(os.getcwd() + '/scripts/ask_aliyun_ssl.sh', '/auto_ssl_push_svn/setup.sh')
+        ssh.upload_file(os.getcwd() + f'/scripts/ask_{domain_manufacturer}_ssl.sh', '/auto_ssl_push_svn/setup.sh')
         # 运行申请证书容器
-        ssh.execute_command(f'cd /auto_ssl_push_svn && chmod +x setup.sh && ./setup.sh {self.mail} {domain} {aliyun_access_key} {aliyun_access_secret}')
+        ssh.execute_command(f'cd /auto_ssl_push_svn && chmod +x setup.sh && ./setup.sh {self.mail} {domain} {access_key} {access_secret}')
         ssh.close()
         # 判断是否是泛域名，如果是泛域名生成的文件夹是不带*的
         if not domain.startswith('*'):

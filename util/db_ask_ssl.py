@@ -37,10 +37,11 @@ async def db_ask_ssl(ssl_id: Optional[int] = None):
                 if first_domain_data.domain_manufacturer == 'ali':
                     ask_ssl = SslFunction()
                     # 获取ssl证书
-                    if await ask_ssl.ask_aliyun_ssl(aliyun_access_key=first_domain_data.domain_account_key,
+                    if await ask_ssl.ask_ssl(aliyun_access_key=first_domain_data.domain_account_key,
                                        aliyun_access_secret=first_domain_data.domain_account_secret,
                                        domain=ssl_data.certificate_domain,
-                                       ssl_id=ssl_data.id):
+                                       ssl_id=ssl_data.id,
+                                       domain_manufacturer=first_domain_data.domain_manufacturer):
                         list_server = ast.literal_eval(ssl_data.server_ids)
                         servers = await Server.filter(id__in=list_server)
                         for server in servers:
@@ -71,10 +72,11 @@ async def db_ask_ssl(ssl_id: Optional[int] = None):
             if first_domain_data.domain_manufacturer == 'ali':
                 ask_ssl = SslFunction()
                 # 获取ssl证书
-                if await ask_ssl.ask_aliyun_ssl(aliyun_access_key=first_domain_data.domain_account_key,
-                                   aliyun_access_secret=first_domain_data.domain_account_secret,
-                                   domain=ssl_data.certificate_domain,
-                                   ssl_id=ssl_data.id):
+                if await ask_ssl.ask_ssl(aliyun_access_key=first_domain_data.domain_account_key,
+                                       aliyun_access_secret=first_domain_data.domain_account_secret,
+                                       domain=ssl_data.certificate_domain,
+                                       ssl_id=ssl_data.id,
+                                       domain_manufacturer=first_domain_data.domain_manufacturer):
                     list_server = ast.literal_eval(ssl_data.server_ids)
                     servers = await Server.filter(id__in=list_server)
                     for server in servers:
