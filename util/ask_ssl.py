@@ -36,18 +36,12 @@ class SslFunction(object):
         :param domain:                  域名
         :param ssl_id:                  证书id
         """
-        with open('./temp/' + 'aliyun.ini', encoding="utf-8", mode="a") as f:
-            f.write(f'dns_aliyun_access_key = {aliyun_access_key}\n')
-            f.write(f'dns_aliyun_access_key_secret = {aliyun_access_secret}')
-        exec_shell(f'chmod 600 {os.getcwd()}/temp/aliyun.ini')
         # 复制配置文件到运行目录
         ssh = SSHClient(host=self.server_host, password=self.server_passwd)
         ssh.execute_command('mkdir -p /auto_ssl_push_svn')
-        ssh.upload_file(os.getcwd() + '/temp/aliyun.ini', '/auto_ssl_push_svn/aliyun.ini')
         ssh.upload_file(os.getcwd() + '/scripts/ask_aliyun_ssl.sh', '/auto_ssl_push_svn/setup.sh')
-        os.remove(os.getcwd() + '/temp/aliyun.ini')
         # 运行申请证书容器
-        ssh.execute_command(f'cd /auto_ssl_push_svn && chmod +x setup.sh && ./setup.sh {self.mail} {domain}')
+        ssh.execute_command(f'cd /auto_ssl_push_svn && chmod +x setup.sh && ./setup.sh {self.mail} {domain} {aliyun_access_key} {aliyun_access_secret}')
         ssh.close()
         # 判断是否是泛域名，如果是泛域名生成的文件夹是不带*的
         if not domain.startswith('*'):
