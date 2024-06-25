@@ -5,8 +5,8 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
     && apk add --no-cache libffi openssl subversion \
     && apk del .build-deps
 ADD requirements.txt .
-RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel gunicorn -i https://pypi.tuna.tsinghua.edu.cn/simple \
-    && pip3 install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel gunicorn -i https://mirrors.aliyun.com/pypi/simple \
+    && pip3 install --no-cache-dir -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
 ADD . .
 RUN rm -f /etc/localtime && ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' > /etc/timezone
 CMD uvicorn main:app --host 0.0.0.0 --port 8000
