@@ -10,7 +10,7 @@ from util.ask_ssl import SslFunction
 from models.first_domain import first_domain
 from models.server import Server
 from models.ssl import Ssl
-from settings import setting
+from pyconfig_util.config_util import setting
 
 
 async def db_ask_ssl(ssl_id: Optional[int] = None):

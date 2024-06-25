@@ -12,7 +12,7 @@ from pyssh_util.ssh_util import SSHClient
 from pysvn_util.svn_util import SVNClient
 
 from models.ssl import Ssl
-from settings import setting
+from pyconfig_util.config_util import setting
 from pycheck_domain.check_domain import check_ssl
 
 
