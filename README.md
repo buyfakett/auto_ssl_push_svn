@@ -53,6 +53,12 @@ docker run -id \
 buyfakett/auto_ssl_push_svn
 ```
 
+### 屏幕截图
+
+![](img/1.png)
+
+![](img/2.png)
+
 ### 支持
 
 1. 【Star】他，让他看到你是爱他的；
