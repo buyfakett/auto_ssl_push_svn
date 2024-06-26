@@ -21,10 +21,7 @@ from api.server import server
 from api.ssl import ssl
 from api.user import user
 from settings import TORTOISE_ORM
-from pyinitlog_util.pyinitlog_util import init_log
 from pyconfig_util.config_util import setting
-
-init_log()
 
 # 初始化文件夹
 for init_dir in ['web/static', 'web/admin']:
