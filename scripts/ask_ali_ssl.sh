@@ -28,4 +28,4 @@ docker run -i --rm \
 -v /auto_ssl_push_svn/letsencrypt:/etc/letsencrypt \
 -v /auto_ssl_push_svn/aliyun.ini:/data/aliyun.ini \
 -v /auto_ssl_push_svn/log/:/var/log/letsencrypt/ \
-registry.cn-hangzhou.aliyuncs.com/buyfakett/certbot-dns-aliyun ${cmd_args}
+registry.cn-hangzhou.aliyuncs.com/buyfakett/dns-aliyun:v2.3.0 ${cmd_args}
