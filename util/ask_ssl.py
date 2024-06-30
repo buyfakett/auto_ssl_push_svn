@@ -49,7 +49,7 @@ class SslFunction(object):
             ssl_path = f'/auto_ssl_push_svn/letsencrypt/live/{domain}/'
         else:
             ssl_path = f'/auto_ssl_push_svn/letsencrypt/live/{domain[2:]}/'
-        if not check_file(ssl_path, 'fullchain.pem'):
+        if not check_file(directory=ssl_path, filename='fullchain.pem', is_single_check=False):
             logging.error(f'没有成功申请证书 {domain}，原因未知')
             return False
         try:
